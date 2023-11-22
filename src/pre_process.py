@@ -3,5 +3,5 @@ class pre_process:
         self.data = data
 
     def procsee(self) -> dict:
-        # add features  preprocess the data
+        # add features and preprocess the data
         return self.data
