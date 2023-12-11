@@ -1,7 +1,17 @@
+import numpy as np
+import pandas as pd
 class pre_process:
-    def __init__(self, data: dict):
-        self.data = data
+    def __init__(self, train: pd.DataFrame, test: pd.DataFrame):
+        self.train = train
+        self.test = test
 
-    def procsee(self) -> dict:
-        # add features and preprocess the data
-        return self.data
+    def preprocsee(self, method: str):
+        if method == 'Brute' :
+            self.Brute()
+        else :
+            raise Exception("pre_process: No such method")
+        
+        return (self.train, self.test)
+    
+    def Brute(self):
+        pass
