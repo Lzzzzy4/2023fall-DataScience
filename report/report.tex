@@ -7,12 +7,16 @@
 \usepackage{graphicx}
 \usepackage{floatrow}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{enumitem}
+\setlist[itemize]{noitemsep}
 
 \title{\textbf{数据科学导论实验报告}}
 \author{吕思翰\ 来泽远\ 曹宸瑞}
 
 \begin{document}
 \renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+
 \maketitle
 
 % \tableofcontents
@@ -25,7 +29,7 @@
 
 \section{比赛名称}
 
-Predict CO2 Emissions in Rwanda
+Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 
 \section{成员}
 
@@ -53,7 +57,7 @@ Predict CO2 Emissions in Rwanda
 
 \subsection{数据概览与特性}
 
-\begin{table}
+\begin{table}[h]
       \centering
       \begin{tabular}{|l|l|l|l|}
       \hline
@@ -69,20 +73,53 @@ Predict CO2 Emissions in Rwanda
           74 & Cloud\_solar\_zenith\_angle & 78539 non-null & float64 \\ \hline
           75 & emission & 79023 non-null & float64 \\ \hline
       \end{tabular}
+      \caption{数据集概览}
 \end{table}
 
 \begin{itemize}
       \item 数据集共有79023行，76列，其中75列为特征，1列为预测值。
-      \item 除经纬度外其余值均为`float64`，不需要做额外数据处理。
+      \item 除经纬度外其余值均为`float64'，不需要做额外数据处理。
       \item 部分测试量包含空值，可以进行特殊值处理。
-      \item 可用作索引的值有`latitude longitude year week\_no`，需预测值为`emission`，其余特征
+      \item 可用作索引的值有`latitude longitude year week\_no'，需预测值为`emission'，其余特征
 \end{itemize}
 
 \subsection{特征分析}
+
+\subsubsection{经纬度}
+
+\subsubsection{年份}
+
+\subsubsection{周数}
+
+\subsubsection{其他特征}
+
+除了上述特征外，数据集还给出了大量的气象数据，包括二氧化硫、一氧化碳、二氧化氮、甲醛、臭氧、紫外线气溶胶、云等物质的方位角、天顶角、深度、角度、密度、压力、温度、反射率等信息。我们认为这些信息对于预测二氧化碳排放量有一定的参考价值。以下是对这些特征的分析。
+
+以SulphurDioxide\_SO2\_column\_number\_density为例，计算其与emission的相关系数并作出散点图，得到结果如下：
+
+\begin{center}
+Pearson correlation: -0.013960940599134839
+
+Spearman correlation: -0.06904123013729443
+\end{center}
+
+
+\begin{figure}[H]
+      \centering
+      \includegraphics[width=1\textwidth]{output1.png}
+      \caption{SulphurDioxide\_SO2\_column\_number\_density与emission的散点图}
+\end{figure}
+
+可以看出，这两者之间的相关性非常小，因此我们认为这些气象数据对于预测二氧化碳排放量的影响可以忽略不计。
+
+我们还对其他气象数据进行了类似的分析，得到的结果也是类似的，因此我们决定舍弃这些气象数据。
+
 \subsection{数据预处理}
+
 \subsection{模型训练}
 
 \section{评估}
+
 \section{团队成员分工}
 
 \subsection{吕思翰}
