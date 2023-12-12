@@ -53,7 +53,7 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 
 本次比赛的评价指标是均方根误差(RMSE)。RMSE是预测值和实际值之间差异的平方的平均值的平方根。RMSE的值越低，表示模型的预测能力越好。RMSE定义为：$$RMSE=\sqrt{\frac{1}{N}\sum\limits_{i=1}^{N}(y_i-\hat y_i)^2}$$其中$y_i$是真实值，$\hat y_i$是预测值，N是样本数量。
 
-\section{做题思路}
+\section{数据分析}
 
 \subsection{数据概览与特性}
 
@@ -80,16 +80,26 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
       \item 数据集共有79023行，76列，其中75列为特征，1列为预测值。
       \item 除经纬度外其余值均为`float64'，不需要做额外数据处理。
       \item 部分测试量包含空值，可以进行特殊值处理。
-      \item 可用作索引的值有`latitude longitude year week\_no'，需预测值为`emission'，其余特征
+      \item 可用作索引的值有`latitude longitude year week\_no'，需预测值为`emission'，其余特征可以分类为`CarbonMonoxide Cloud Formaldehyde NitrogenDioxide Ozone SulphurDioxide UvAerosolIndex UvAerosolLayerHeight'。
 \end{itemize}
 
 \subsection{特征分析}
 
+\subsubsection{年份与周数}
+
+首先我们考虑排放量与时间的关系。我们将年份和周数相关联作为日期，作出总排放量关于日期的折线图，得到结果如下：
+
+\begin{figure}[H]
+      \centering
+      \includegraphics[width=1\textwidth]{output2.png}
+      \caption{date与emission的折线图}
+\end{figure}
+
+可以看出，排放量随时间的变化呈现出一定的周期性，因此我们认为年份和周数对于预测二氧化碳排放量有一定的参考价值。我们将年份和周数作为特征之一加入模型。
+
+但是，值得注意的是，由于新冠病毒的影响，2020年的数据与其他年份的数据有较大的差异，后续需要针对2020年的数据进行特殊处理。
+
 \subsubsection{经纬度}
-
-\subsubsection{年份}
-
-\subsubsection{周数}
 
 \subsubsection{其他特征}
 
@@ -114,7 +124,16 @@ Spearman correlation: -0.06904123013729443
 
 我们还对其他气象数据进行了类似的分析，得到的结果也是类似的，因此我们决定舍弃这些气象数据。
 
+\subsubsection{权重量化}
+
+
 \subsection{数据预处理}
+
+\subsubsection{缺失值处理}
+
+\subsubsection{异常值处理}
+
+\subsubsection{特征选择}
 
 \subsection{模型训练}
 
