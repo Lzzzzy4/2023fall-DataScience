@@ -1,5 +1,6 @@
-\documentclass{ctexart}
+\documentclass[fontset=windows]{ctexart}
 \usepackage{babel}
+\usepackage{anyfontsize}
 \usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
 \usepackage{amsmath, amssymb}
 \usepackage{graphicx}
@@ -9,7 +10,7 @@
 \usepackage{longtable}
 \setlist[itemize]{noitemsep}
 
-\title{数据科学导论实验报告}
+\title{\textbf{数据科学导论实验报告}}
 \author{吕思翰\ 来泽远\ 曹宸瑞}
 
 \begin{document}
@@ -145,11 +146,15 @@ Spearman correlation: -0.06904123013729443
 
 \subsection{模型选择}
 
+这是一个回归问题，我们尝试了多种回归模型，包括线性回归、CatBoost、RandomForest、RadiusNeighbors、KNeighbors等，最终选择了CatBoost作为最终的模型。
+
 % \subsubsection{线性回归}
+
+\subsubsection{CatBoost（类别提升）}
 
 \subsubsection{RandomForest（随机森林）}
 
-\subsubsection{CatBoost（类别提升）}
+我们使用了经纬度、年份、周数作为输入，参数设置min\_samples\_leaf=6，使用随机森林模型进行训练，得到的结果如下：
 
 \subsubsection{RadiusNeighbors（半径近邻）}
 
@@ -177,7 +182,7 @@ Spearman correlation: -0.06904123013729443
 
 \subsection{曹宸瑞}
 
-\section{个人总结与感悟}
+\section{总结与感悟}
 
 \ctexset{bibname=参考文献}
 \begin{thebibliography}{100}
