@@ -8,7 +8,34 @@
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \usepackage{enumitem}
 \usepackage{longtable}
+\usepackage{listings}
 \setlist[itemize]{noitemsep}
+\lstset{
+    basicstyle          =   \sffamily,          % 基本代码风格
+    keywordstyle        =   \bfseries,          % 关键字风格
+    commentstyle        =   \rmfamily\itshape,  % 注释的风格，斜体
+    stringstyle         =   \ttfamily,  % 字符串风格
+    flexiblecolumns,                % 别问为什么，加上这个
+    numbers             =   left,   % 行号的位置在左边
+    showspaces          =   false,  % 是否显示空格，显示了有点乱，所以不现实了
+    numberstyle         =   \zihao{-5}\ttfamily,    % 行号的样式，小五号，tt等宽字体
+    showstringspaces    =   false,
+    captionpos          =   t,      % 这段代码的名字所呈现的位置，t指的是top上面
+    frame               =   lrtb,   % 显示边框
+}
+
+\lstdefinestyle{Python}{
+    language        =   Python, % 语言选Python
+    basicstyle      =   \zihao{-5}\ttfamily,
+    numberstyle     =   \zihao{-5}\ttfamily,
+    keywordstyle    =   \color{blue},
+    keywordstyle    =   [2] \color{teal},
+    stringstyle     =   \color{magenta},
+    commentstyle    =   \color{red}\ttfamily,
+    breaklines      =   true,   % 自动换行，建议不要写太长的行
+    columns         =   fixed,  % 如果不加这一句，字间距就不固定，很丑，必须加
+    basewidth       =   0.5em,
+}
 
 \title{\textbf{数据科学导论实验报告}}
 \author{吕思翰\ 来泽远\ 曹宸瑞}
@@ -112,7 +139,33 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 
 除了上述特征外，数据集还给出了大量的气象数据，包括二氧化硫、一氧化碳、二氧化氮、甲醛、臭氧、紫外线气溶胶、云等物质的方位角、天顶角、深度、角度、密度、压力、温度、反射率等信息。我们认为这些信息对于预测二氧化碳排放量有一定的参考价值。以下是对这些特征的分析。
 
-以 \texttt{SulphurDioxide\_SO2\_column\_number\_density} 为例，计算其与 \texttt{emission} 的相关系数并作出散点图，得到结果如下：
+以 \texttt{SulphurDioxide\_SO2\_column\_number\_density} 为例，计算其与 \texttt{emission} 的相关系数并作出散点图，代码如下：
+
+\begin{lstlisting}[style=Python]
+      # 加载数据
+      data_path = os.path.abspath('.') + '/../data/'
+      df = pd.read_csv(data_path + "train.csv")
+      col = "SulphurDioxide_SO2_column_number_density"
+      df = df[df['year'] == 2020]
+      df = df.dropna(subset=[col, 'emission'])
+      
+      # 计算相关系数
+      pearson_corr, _ = pearsonr(df[col], df['emission'])
+      spearman_corr, _ = spearmanr(df[col], df['emission'])
+      
+      # 绘制散点图
+      plt.figure(figsize=(10, 6))
+      sns.scatterplot(x=col, y='emission', data=df)
+      plt.title('Scatter plot of ' + col + ' vs emission')
+      plt.show()
+      
+      # 进行回归分析
+      X = sm.add_constant(df[col])
+      model = sm.OLS(df['emission'], X)
+      results = model.fit()
+\end{lstlisting}
+
+得到结果如下：
 
 \begin{center}
 Pearson correlation: -0.013960940599134839
