@@ -53,7 +53,7 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 
 本次比赛的评价指标是均方根误差(RMSE)。RMSE是预测值和实际值之间差异的平方的平均值的平方根。RMSE的值越低，表示模型的预测能力越好。RMSE定义为：$$RMSE=\sqrt{\frac{1}{N}\sum\limits_{i=1}^{N}(y_i-\hat y_i)^2}$$其中$y_i$是真实值，$\hat y_i$是预测值，N是样本数量。
 
-\section{做题思路}
+\section{解题思路}
 
 \subsection{数据概览与特性}
 
@@ -82,6 +82,14 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
       \item 部分测试量包含空值，可以进行特殊值处理。
       \item 可用作索引的值有`latitude longitude year week\_no'，需预测值为`emission'，其余特征
 \end{itemize}
+
+\subsection{数据预处理}
+
+\subsubsection{空值处理}
+
+\subsubsection{特殊值处理}
+
+\subsubsection{数据归一化}
 
 \subsection{特征工程}
 
@@ -114,21 +122,17 @@ Spearman correlation: -0.06904123013729443
 
 我们还对其他气象数据进行了类似的分析，得到的结果也是类似的，因此我们决定舍弃这些气象数据。
 
-\subsection{数据预处理}
-
-\subsubsection{空值处理}
-
-\subsubsection{特殊值处理}
-
-\subsubsection{数据归一化}
-
 \subsection{模型选择}
+
+这是一个回归问题，我们尝试了多种回归模型，包括线性回归、CatBoost、RandomForest、RadiusNeighbors、KNeighbors等，最终选择了CatBoost作为最终的模型。
 
 % \subsubsection{线性回归}
 
+\subsubsection{CatBoost（类别提升）}
+
 \subsubsection{RandomForest（随机森林）}
 
-\subsubsection{CatBoost（类别提升）}
+我们使用了经纬度、年份、周数作为输入，参数设置min\_samples\_leaf=6，使用随机森林模型进行训练，得到的结果如下：
 
 \subsubsection{RadiusNeighbors（半径近邻）}
 
@@ -156,7 +160,7 @@ Spearman correlation: -0.06904123013729443
 
 \subsection{曹宸瑞}
 
-\section{个人总结与感悟}
+\section{总结与感悟}
 
 \ctexset{bibname=参考文献}
 \begin{thebibliography}{100}  
