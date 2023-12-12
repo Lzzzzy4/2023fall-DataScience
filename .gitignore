@@ -1,11 +1,6 @@
-# PDF documents
-*.pdf
-
-# Submission file
-data/submission.csv
-
-# Intermediate output
-/src/catboost_info/
+report.pdf
+catboost_info/
+latex.out/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
