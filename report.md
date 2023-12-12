@@ -1,16 +1,17 @@
+---
+title: 数据科学导论实验报告
+实验五：ARP
+author: 吕思翰 来泽远 曹宸瑞
+mainfont: sans-serif
+maxwidth: 60em
+---
+
 # 数据科学导论实验报告
+
 
 ## 比赛名称
 
 - Predict CO2 Emissions in Rwanda
-
-## 成员
-
-吕思翰 PB21000144
-
-来泽远 PB21000164
-
-曹宸瑞 PB21020659
 
 ## 问题定义
 
