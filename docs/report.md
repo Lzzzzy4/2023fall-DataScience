@@ -29,11 +29,11 @@
 | 74   | Cloud_solar_zenith_angle                     | 78539 non-null | float64 |
 | 75   | emission                                     | 79023 non-null | float64 |
 
-共76行，除经纬度外其余值均为`float64`，不需要做额外数据处理。
+共76行，除经纬度外其余值均为`float64`，不需要做额外数据类型处理。
 
 部分测试量包含空值，可以进行特殊值处理。
 
-可用作索引的值有`latitude longitude year week_no`，需预测值为`emission`，其余特征
+可用作索引的值有`latitude longitude year week_no`，需预测值为`emission`，其余特征an
 
 ## 特征分析
 

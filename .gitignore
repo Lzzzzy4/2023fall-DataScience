@@ -1,6 +1,12 @@
 report.pdf
 catboost_info/
+
 latex.out/
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.synctex(busy)
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
