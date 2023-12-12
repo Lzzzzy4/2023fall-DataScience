@@ -61,7 +61,7 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
       \centering
       \begin{tabular}{|l|l|l|l|}
       \hline
-          \# & Column & Non-Null Count & Dtype \\ \hline
+          \ & Column & Non-Null Count & Dtype \\ \hline
           0 & ID\_LAT\_LON\_YEAR\_WEEK & 79023 non-null & object \\ \hline
           1 & latitude & 79023 non-null & float64 \\ \hline
           2 & longitude & 79023 non-null & float64 \\ \hline
@@ -83,7 +83,7 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
       \item 可用作索引的值有`latitude longitude year week\_no'，需预测值为`emission'，其余特征
 \end{itemize}
 
-\subsection{特征分析}
+\subsection{特征工程}
 
 \subsubsection{经纬度}
 
@@ -106,7 +106,7 @@ Spearman correlation: -0.06904123013729443
 
 \begin{figure}[H]
       \centering
-      \includegraphics[width=1\textwidth]{output1.png}
+      \includegraphics[width=0.8\textwidth]{output1.png}
       \caption{SulphurDioxide\_SO2\_column\_number\_density与emission的散点图}
 \end{figure}
 
@@ -116,7 +116,35 @@ Spearman correlation: -0.06904123013729443
 
 \subsection{数据预处理}
 
-\subsection{模型训练}
+\subsubsection{空值处理}
+
+\subsubsection{特殊值处理}
+
+\subsubsection{数据归一化}
+
+\subsection{模型选择}
+
+% \subsubsection{线性回归}
+
+\subsubsection{RandomForest（随机森林）}
+
+\subsubsection{CatBoost（类别提升）}
+
+\subsubsection{RadiusNeighbors（半径近邻）}
+
+\subsubsection{KNeighbors（K近邻）}
+
+% \subsubsection{MLPRegressor（多层感知器）}
+
+% \subsubsection{SVR（支持向量回归）}
+
+% \subsubsection{XGBRegressor（XGBoost回归）}
+
+% \subsubsection{LGBMRegressor（LightGBM回归）}
+
+% \subsubsection{AdaBoostRegressor（AdaBoost回归）}
+
+% \subsubsection{GradientBoostingRegressor（梯度提升回归）}
 
 \section{评估}
 
