@@ -119,6 +119,42 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
       \item 可用作索引的值有 \texttt{latitude}，\texttt{longitude}，\texttt{year} \texttt{week\_no}，需预测值为 \texttt{emission}，其余特征可以分类为 \texttt{CarbonMonoxide}，\texttt{Cloud}， \texttt{Formaldehyde}，\texttt{NitrogenDioxide}，\texttt{Ozone}，\texttt{SulphurDioxide}，\texttt{UvAerosolIndex}，\texttt{UvAerosolLayerHeight}。
 \end{itemize}
 
+\subsection{数据预处理}
+
+\subsubsection{缺失值处理}
+
+使用\verb|train.isnull().sum()|可以查看训练集每一列的缺失值数量，结果如表\ref{tab:1}所示。
+
+\begin{table}[h]
+      \centering
+      \begin{tabular}{l|l}
+      \hline
+      Column & Non-Null Count \\ \hline
+      \texttt{UvAerosolLayerHeight\_aerosol\_height} & 78584 \\
+      \texttt{UvAerosolLayerHeight\_solar\_zenith\_angle} & 78584 \\
+      \texttt{UvAerosolLayerHeight\_solar\_azimuth\_angle} & 78584 \\
+      \ldots{} & \\
+      \texttt{NitrogenDioxide\_tropopause\_pressure} & 18320 \\
+      \texttt{NitrogenDioxide\_stratospheric\_NO2\_column\_number\_density} & 18320 \\
+      \texttt{NitrogenDioxide\_NO2\_slant\_column\_number\_density} & 18320 \\
+      \ldots{} & \\
+      \texttt{SulphurDioxide\_SO2\_column\_number\_density\_15km} & 14609 \\
+      \texttt{SulphurDioxide\_solar\_zenith\_angle} & 14609 \\
+      \texttt{SulphurDioxide\_solar\_azimuth\_angle} & 14609 \\
+      \ldots{} & \\
+      \hline
+      \end{tabular}
+      \caption{\label{tab:1}缺失值概览}
+\end{table}
+
+对于缺失值较多的列，如\texttt{UvAerosolLayerHeight}，缺失率达到99\%，我们可以考虑直接删除。对于缺失值较少的列，我们可以考虑使用均值填充。
+
+对于测试集，我们可以进行类似操作。
+
+\subsubsection{异常值处理}
+
+\subsubsection{数据归一化}
+
 \subsection{特征分析}
 
 \subsubsection{年份与周数}
@@ -147,7 +183,7 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 
 \subsubsection{经纬度}
 
-首先，我们将每个地区的排放量求和，以其排放量高低在地图上标记颜色从浅至深的红圈,结果如下：
+首先，我们将每个地区的排放量求和，以其排放量高低在地图上标记颜色从浅至深的红圈，结果如下：
 
 \begin{figure}[H]
       \centering
@@ -157,12 +193,12 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 
 和城市聚集类似，几个距离较近的采样点，他们的碳排放量也是相近的，并且不难发现大部分采样点较为密集，这为使用聚类提供了数据支持。在模型中，可以使用距离相近的采样点的数据来相互预测。
 
-其次，我们考察不同地点碳排放的变化。以年为单位，作出折线图如下：
+其次，我们考察不同地点碳排放的变化，作出各个地点以年为单位的碳排放量变化如图\ref{fig:5}：
 
 \begin{figure}[H]
       \centering
       \includegraphics[width=0.8\textwidth]{output5.png}
-      \caption{碳排放变化}
+      \caption{\label{fig:5}碳排放变化}
 \end{figure}
 
 我们将每一年的碳排放除以2019年的碳排放，作为相对值。若排除新冠的影响，对于绝大部分地点，其碳排放是较为稳定的，在某一个基准附近存一定浮动（多为上升）。而对于这个基准值，经纬度是与其强相关的。
@@ -181,9 +217,9 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 
 \subsubsection{其他特征}
 
-除了上述特征外，数据集还给出了大量的气象数据，包括二氧化硫、一氧化碳、二氧化氮、甲醛、臭氧、紫外线气溶胶、云等物质的方位角、天顶角、深度、角度、密度、压力、温度、反射率等信息。我们认为这些信息对于预测二氧化碳排放量有一定的参考价值。以下是对这些特征的分析。
+除了上述特征外，数据集还给出了大量的气象数据，包括二氧化硫(SO2)、一氧化碳(CO)、二氧化氮(NO2)、甲醛(HCHO)、臭氧(O3)、紫外线气溶胶、云等物质的方位角、天顶角、深度、角度、密度、压力、温度、反射率等信息。我们认为这些信息对于预测二氧化碳排放量有一定的参考价值。以下是对这些特征的分析。
 
-以 \texttt{SulphurDioxide\_SO2\_column\_number\_density} 为例，计算其与 \texttt{emission} 的相关系数并作出散点图，代码如下：
+以2020年 \texttt{SulphurDioxide\_SO2\_column\_number\_density} 为例，计算其与 \texttt{emission} 的相关系数并作出散点图，代码如下：
 
 \begin{lstlisting}[style=Python]
       # 加载数据
@@ -224,20 +260,32 @@ Spearman correlation: -0.06904123013729443
       \caption{\texttt{SulphurDioxide\_SO2\_column\_number\_density} 与 \texttt{emission} 的散点图}
 \end{figure}
 
-可以看出，这两者之间的相关性非常小，因此我们认为这些气象数据对于预测二氧化碳排放量的影响可以忽略不计。
+可以看出，这两者之间的相关性非常小，因此我们认为\texttt{SO2\_column\_number\_density}数据对于预测二氧化碳排放量的影响可以忽略不计。
 
-我们还对其他气象数据进行了类似的分析，得到的结果也是类似的，因此我们决定舍弃这些气象数据。
+我们还对其他气象数据进行了类似的分析，没有出现与C02有较大相关性的数据。初步分析后，我们认为这些气象数据与C02排放量之间可能没有明显关系，理由如下：
+
+\begin{itemize}
+      \item 卢旺达是一个直径200公里的小国，每天都有邻国的空气取代卢旺达的整个大气。即使卢旺达所产生的各种气体之间有一定的相关性，也会被邻国的空气所影响。
+      \item 二氧化碳排放来自不同的部门（地面交通、空中交通、供暖、发电、工厂等），而这些部门并不一定排放与CO2成比例的NO2、CO、SO2等气体。我们认为只在特定区域如工厂，CO2可能会与S02等成正比例关系。
+\end{itemize}
+
+因此，我们借用排放量地图进行分析，对排放量最多的地点测量得到的数据进行相关性分析。有理由相信如果CO2主要来自工厂，会同时产生大量SO2、CO等气体。以2021年CarbonMonoxide CO column number density为例，得到结果如下：
+
+\begin{center}
+      Pearson correlation: -0.0016211411671317282
+
+      Spearman correlation: 0.002390506275078972
+\end{center}
+
+\begin{figure}[H]
+      \centering
+      \includegraphics[width=0.8\textwidth]{output7.png}
+      \caption{\texttt{CarbonMonoxide\_CO\_column\_number\_density} 与 \texttt{emission} 的散点图}
+\end{figure}
+
+我们无法得出该气体与C02排放量之间有明显的相关性。类似的，我们对该地点的其他气象数据进行了计算，也未能分析出得到更多有价值的信息。
 
 \subsubsection{权重量化}
-
-
-\subsection{数据预处理}
-
-\subsubsection{缺失值处理}
-
-\subsubsection{特殊值处理}
-
-\subsubsection{数据归一化}
 
 \subsection{模型选择}
 
