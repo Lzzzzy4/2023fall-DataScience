@@ -9,6 +9,8 @@
 \usepackage{enumitem}
 \usepackage{longtable}
 \usepackage{listings}
+\usepackage{xcolor}
+\definecolor{teal}{RGB}{0,128,128}
 \setlist[itemize]{noitemsep}
 \lstset{
     basicstyle          =   \sffamily,          % 基本代码风格
@@ -115,13 +117,16 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 \begin{itemize}
       \item 数据集共有79023行，76列，其中75列为特征，1列为预测值。
       \item 除经纬度外其余值均为 \texttt{float64}，不需要做额外数据处理。
-      \item 部分测试量包含空值，可以进行特殊值处理。
-      \item 可用作索引的值有 \texttt{latitude}，\texttt{longitude}，\texttt{year} \texttt{week\_no}，需预测值为 \texttt{emission}，其余特征可以分类为 \texttt{CarbonMonoxide}，\texttt{Cloud}， \texttt{Formaldehyde}，\texttt{NitrogenDioxide}，\texttt{Ozone}，\texttt{SulphurDioxide}，\texttt{UvAerosolIndex}，\texttt{UvAerosolLayerHeight}。
+      \item 部分测试量包含空值，可以进行缺失值处理。
+      \item 可用作索引的值有 \texttt{latitude}，\texttt{longitude}，\texttt{year} \texttt{week\_no}，需预测值为 \texttt{emission}
+      \item 其余特征可以分类为 \texttt{CarbonMonoxide}，\texttt{Cloud}， \texttt{Formaldehyde}，\texttt{NitrogenDioxide}，\texttt{Ozone}，\texttt{SulphurDioxide}，\texttt{UvAerosolIndex}，\texttt{UvAerosolLayerHeight}。
 \end{itemize}
 
 \subsection{数据预处理}
 
 \subsubsection{缺失值处理}
+
+在数据预处理阶段，缺失值处理是一个重要的步骤。缺失值可能会导致统计分析的结果出现偏差，或者使得机器学习算法无法正确地工作。
 
 使用\verb|train.isnull().sum()|可以查看训练集每一列的缺失值数量，结果如表\ref{tab:1}所示。
 
@@ -147,19 +152,29 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
       \caption{\label{tab:1}缺失值概览}
 \end{table}
 
-对于缺失值较多的列，如\texttt{UvAerosolLayerHeight}，缺失率达到99\%，我们可以考虑直接删除。对于缺失值较少的列，我们可以考虑使用均值填充。
+虽然某些机器学习算法，如决策树和随机森林，可以直接处理缺失值，但由于后续模型还未确定，故还是在此对缺失值进行处理。对于缺失值较多的列，如\texttt{UvAerosolLayerHeight}，缺失率达到99\%，我们可以考虑直接删除。对于缺失值较少的列，我们可以考虑使用均值填充。
 
-对于测试集，我们可以进行类似操作。
-
-\subsubsection{异常值处理}
+对于测试集，我们可以进行类似缺失值处理操作。
 
 \subsubsection{数据归一化}
+
+数据归一化是一种常用的数据预处理技术，用于将数据转换到一个公共的尺度。这种技术在机器学习和数据挖掘中非常常见，因为许多算法（如神经网络）对输入数据的尺度和分布有一定的假设。
+
+数据归一化通常涉及将数值特征缩放到一个固定的范围（如0到1），或者将它们转换为具有零均值和单位方差的值。这样可以确保所有特征在模型训练过程中具有相同的重要性，而不会因为它们的尺度不同而被赋予不同的权重。
+
+可以使用 \texttt{sklearn.preprocessing} 模块中的 \texttt{MinMaxScaler} 或 \texttt{StandardScaler} 类来进行数据归一化，代码如下：
+
+\begin{lstlisting}[style=Python]
+      from sklearn.preprocessing import StandardScaler
+      scaler = StandardScaler()
+      train = scaler.fit_transform(train)
+\end{lstlisting}
 
 \subsection{特征分析}
 
 \subsubsection{年份与周数}
 
-首先我们考虑排放量与时间的关系。我们将年份和周数相关联作为日期，作出总排放量关于日期的折线图，得到结果如下：
+首先我们考虑排放量与时间的关系。我们将年份和周数相关联作为日期，作出总排放量关于日期的折线图，得到结果如下（红线划分了2019-2021年的数据）：
 
 \begin{figure}[H]
       \centering
@@ -171,34 +186,34 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 
 但是，值得注意的是，由于新冠病毒的影响，2020年的数据与其他年份的数据有较大的差异，后续需要针对2020年的数据进行特殊处理。
 
-我们将2019与2021年的数据平均，作图得到关于月度的排放量折线图，结果如下：
+我们将2019与2021年的数据平均后，作图得到排放量关于月份的折线图，结果如下：
 
 \begin{figure}[H]
       \centering
       \includegraphics[width=0.6\textwidth]{output3.png}
-      \caption{mouth与emission的折线图}
+      \caption{排放量关于月份的折线图}
 \end{figure}
 
 结合两图可以发现，一年内某几个特殊的月份具有较高的排放量，这可能与人类生产活动习惯相关。对于同一个地点，周数（月份）与排放量具有较高的相关性，且关于年份呈现周期变化。这对于数据处理有一定的借鉴意义。
 
 \subsubsection{经纬度}
 
-首先，我们将每个地区的排放量求和，以其排放量高低在地图上标记颜色从浅至深的红圈，结果如下：
+首先，我们将每个地区的排放量求和，以其排放量为半径，以其经纬度为圆心，按照排放量高低标记颜色从浅至深，作出排放量关于经纬度的分布图，结果如下：
 
 \begin{figure}[H]
       \centering
       \includegraphics[width=0.8\textwidth]{output4.png}
-      \caption{排放量地图}
+      \caption{排放量关于经纬度的分布图}
 \end{figure}
 
 和城市聚集类似，几个距离较近的采样点，他们的碳排放量也是相近的，并且不难发现大部分采样点较为密集，这为使用聚类提供了数据支持。在模型中，可以使用距离相近的采样点的数据来相互预测。
 
-其次，我们考察不同地点碳排放的变化，作出各个地点以年为单位的碳排放量变化如图\ref{fig:5}：
+其次，我们考察不同地点碳排放的变化，作出各地点以年为单位的碳排放量变化如图\ref{fig:5}：
 
 \begin{figure}[H]
       \centering
       \includegraphics[width=0.8\textwidth]{output5.png}
-      \caption{\label{fig:5}碳排放变化}
+      \caption{\label{fig:5}各地点排放量关于年份的折线图}
 \end{figure}
 
 我们将每一年的碳排放除以2019年的碳排放，作为相对值。若排除新冠的影响，对于绝大部分地点，其碳排放是较为稳定的，在某一个基准附近存一定浮动（多为上升）。而对于这个基准值，经纬度是与其强相关的。
@@ -210,7 +225,7 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 \begin{figure}[H]
       \centering
       \includegraphics[width=0.8\textwidth]{output6.png}
-      \caption{碳排放变化}
+      \caption{各地点排放量关于周数的折线图}
 \end{figure}
 
 建模可以大致从以下方面入手：
@@ -314,6 +329,25 @@ Spearman correlation: -0.06904123013729443
 % \subsubsection{AdaBoostRegressor（AdaBoost回归）}
 
 % \subsubsection{GradientBoostingRegressor（梯度提升回归）}
+
+\subsection{结果处理}
+
+显然，预测出的CO2排放量不可能为负数，因此我们将预测出的负数值置为0。
+
+除此之外，我们相信训练集的数据中，如果某个地点在2019-2021年的CO2排放量均为0，那么这个地点在2022年的CO2排放量也应该为0。因此，我们将这些地点的预测值置为0。
+
+代码如下：
+
+\begin{lstlisting}[style=Python]
+      y_pred[y_pred < 0] = 0
+      
+      zero_emissions = train.groupby(['latitude', 'longitude'])['emission'].mean().to_frame()
+      zero_emissions = zero_emissions[zero_emissions['emission'] == 0]
+      mask = test.apply(lambda x: (x['latitude'], x['longitude']) in zero_emissions.index, axis=1)
+      y_pred.loc[mask, "emission"] = 0
+\end{lstlisting}
+
+处理后对评估结果(RMSE)有一定的提升。
 
 \section{评估}
 
