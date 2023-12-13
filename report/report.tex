@@ -135,7 +135,49 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 
 但是，值得注意的是，由于新冠病毒的影响，2020年的数据与其他年份的数据有较大的差异，后续需要针对2020年的数据进行特殊处理。
 
+我们将2019与2021年的数据平均，作图得到关于月度的排放量折线图，结果如下：
+
+\begin{figure}[H]
+      \centering
+      \includegraphics[width=0.6\textwidth]{output3.png}
+      \caption{mouth与emission的折线图}
+\end{figure}
+
+结合两图可以发现，一年内某几个特殊的月份具有较高的排放量，这可能与人类生产活动习惯相关。对于同一个地点，周数（月份）与排放量具有较高的相关性，且关于年份呈现周期变化。这对于数据处理有一定的借鉴意义。
+
 \subsubsection{经纬度}
+
+首先，我们将每个地区的排放量求和，以其排放量高低在地图上标记颜色从浅至深的红圈,结果如下：
+
+\begin{figure}[H]
+      \centering
+      \includegraphics[width=0.8\textwidth]{output4.png}
+      \caption{排放量地图}
+\end{figure}
+
+和城市聚集类似，几个距离较近的采样点，他们的碳排放量也是相近的，并且不难发现大部分采样点较为密集，这为使用聚类提供了数据支持。在模型中，可以使用距离相近的采样点的数据来相互预测。
+
+其次，我们考察不同地点碳排放的变化。以年为单位，作出折线图如下：
+
+\begin{figure}[H]
+      \centering
+      \includegraphics[width=0.8\textwidth]{output5.png}
+      \caption{碳排放变化}
+\end{figure}
+
+我们将每一年的碳排放除以2019年的碳排放，作为相对值。若排除新冠的影响，对于绝大部分地点，其碳排放是较为稳定的，在某一个基准附近存一定浮动（多为上升）。而对于这个基准值，经纬度是与其强相关的。
+
+\subsubsection{关于时间和空间的总结}
+
+作出各个地点以周为单位的碳排放量变化如下：
+
+\begin{figure}[H]
+      \centering
+      \includegraphics[width=0.8\textwidth]{output6.png}
+      \caption{碳排放变化}
+\end{figure}
+
+建模可以大致从以下方面入手：
 
 \subsubsection{其他特征}
 
