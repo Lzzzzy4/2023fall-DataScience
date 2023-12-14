@@ -9,10 +9,22 @@ class pre_process:
         self.train = train
         self.test = test
 
-    def preprocsee(self, methods):
-        for method in methods:
-            assert hasattr(self, method), f"pre_process: No such method {method}"
-            getattr(self, method)()
+    def preprocess(self, method: str):
+        for m in method:
+            if m == "KMeans":
+                self.KMeans()
+            elif m == "Rot_15":
+                self.Rot_15()
+            elif m == "Rot_30":
+                self.Rot_30()
+            elif m == "Dist_Rwanda":
+                self.Dist_Rwanda()
+            elif m == "Fillna":
+                self.Fillna()
+            elif m == "Standardize":
+                self.Standardize()
+            else:
+                raise Exception("pre_process: No such method")
 
         return (self.train, self.test)
 
@@ -92,11 +104,14 @@ class pre_process:
         test = self.test
 
         good_col = 'Ozone_solar_azimuth_angle'
-        train[good_col] = train.groupby(['id', 'year'])[good_col].ffill().bfill()
-        test[good_col] = test.groupby(['id', 'year'])[good_col].ffill().bfill()
+        train[good_col] = train.groupby(['year'])[good_col].ffill().bfill()
+        test[good_col] = test.groupby(['year'])[good_col].ffill().bfill()
 
-        train = train.fillna(train.mean())
-        test = test.fillna(test.mean())
+        # try:
+        #     train = train.fillna(train.mean())
+        #     test = test.fillna(test.mean())
+        # except:
+        #     pass
 
         self.train = train
         self.test = test

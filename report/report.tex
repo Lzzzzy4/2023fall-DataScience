@@ -116,9 +116,104 @@ Spearman correlation: -0.06904123013729443
 
 \subsection{数据预处理}
 
-\subsection{模型训练}
+因此，我们借用排放量地图进行分析，对排放量最多的地点测量得到的数据进行相关性分析。有理由相信如果CO2主要来自工厂，会同时产生大量SO2、CO等气体。以2021年CarbonMonoxide CO column number density为例，得到结果如下：
+
+\begin{center}
+      Pearson correlation: -0.0016211411671317282
+
+      Spearman correlation: 0.002390506275078972
+\end{center}
+
+\begin{figure}[H]
+      \centering
+      \includegraphics[width=0.8\textwidth]{output7.png}
+      \caption{\texttt{CarbonMonoxide\_CO\_column\_number\_density} 与 \texttt{emission} 的散点图}
+\end{figure}
+
+我们无法得出该气体与CO2排放量之间有明显的相关性。类似的，我们对该地点的其他气象数据进行了计算，也未能分析出得到更多有价值的信息。
+
+Ozone\_solar\_azimuth\_angle
+
+\subsubsection{权重量化}
+
+\subsection{模型选择}
+
+这是一个回归问题，我们尝试了多种回归模型，包括线性回归、逻辑回归、支持向量回归、决策树回归、类别提升、自适应提升、极端梯度提升、随机森林、半径近邻、K近邻等。
+
+\subsubsection{LinearRegression（线性回归）}
+
+\subsubsection{SupportVectorRegressor（支持向量回归）}
+
+\subsubsection{DecisionTreeRegressor（决策树回归）}
+
+\subsubsection{CatBoostRegressor（类别提升）}
+
+\subsubsection{AdaBoostRegressor（自适应提升）}
+
+\subsubsection{XGBoostRegressor（极端梯度提升）}
+
+\subsubsection{RandomForestRegressor（随机森林）}
+
+我们使用了经纬度、年份、周数作为输入，参数设置min\_samples\_leaf=6，使用随机森林模型进行训练，得到的结果如下：
+
+\subsubsection{RadiusNeighborsRegressor（半径近邻）}
+
+\subsubsection{KNeighborsRegressor（K近邻）}
+
+% \subsubsection{LGBMRegressor（LightGBM回归）}
+
+\subsection{结果优化}
+
+显然，预测出的CO2排放量不可能为负数，因此我们将预测出的负数值置为0。
+
+除此之外，我们相信训练集的数据中，如果某个地点在2019-2021年的CO2排放量均为0，那么这个地点在2022年的CO2排放量也应该为0。因此，我们将这些地点的预测值置为0。
+
+代码如下：
+
+\begin{lstlisting}[style=Python]
+      y_pred[y_pred < 0] = 0
+      
+      zero_emissions = train.groupby(['latitude', 'longitude'])['emission'].mean().to_frame()
+      zero_emissions = zero_emissions[zero_emissions['emission'] == 0]
+      mask = test.apply(lambda x: (x['latitude'], x['longitude']) in zero_emissions.index, axis=1)
+      y_pred.loc[mask, "emission"] = 0
+\end{lstlisting}
+
+处理后对评估结果(RMSE)有一定的提升。
 
 \section{评估}
+
+\subsection{RMSE}
+
+RMSE（Root Mean Square Error，均方根误差）是一种常用的评估回归模型性能的指标。它是观测值与真实值偏差的平方和的平均值的平方根。RMSE 的值越小，说明模型的预测性能越好。在 Python 中，可以使用 scikit-learn 库的 `mean\_squared\_error` 函数计算 RMSE，代码如下：
+
+\begin{lstlisting}[style=Python]
+      def mean_squared_error(self):
+      rmse = mean_squared_error(
+          self.test["emission"], self.ans["emission"], squared=False
+      )
+      return rmse
+\end{lstlisting}
+
+\subsection{交叉验证}
+
+TODO
+
+交叉验证是一种评估模型性能的统计学方法。它的基本思想是将原始数据集分成两部分（训练集和验证集），然后在训练集上训练模型，在验证集上验证模型的性能。这个过程重复多次，每次都用不同的训练集和验证集，最后取平均值作为模型的最终性能。交叉验证的主要优点是它可以利用有限的数据获得模型在未知数据上的性能的更准确的估计。
+
+在 Python 中，可以使用 scikit-learn 库的 cross\_val\_score 函数进行交叉验证，代码如下：
+
+\begin{lstlisting}[style=Python]
+      from sklearn.model_selection import cross_val_score
+      scores = cross_val_score(model, X, y, cv=5, scoring='neg_mean_squared_error')
+      print("RMSE: %0.2f (+/- %0.2f)" % (-scores.mean(), scores.std() * 2))
+\end{lstlisting}
+
+\subsection{预测结果可视化}
+
+\subsection{最终得分}
+
+
 
 \section{团队成员分工}
 

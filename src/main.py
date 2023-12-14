@@ -36,7 +36,7 @@ methods_judge = ["mean_squared_error"]
 
 def run(methods_pre_process, method_model, method_judge):
     p = pre_process(train, test)
-    train_csv, test_csv = p.preprocsee(methods_pre_process)
+    train_csv, test_csv = p.preprocess(methods_pre_process)
 
     m = model(train_csv, test_csv)
     result = m.get_result(method_model)
