@@ -19,6 +19,9 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.model_selection import GridSearchCV
 from xgboost import XGBRegressor
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import KFold
 
 
 class model:
@@ -34,7 +37,9 @@ class model:
         return self.ans
 
     def CatBoostRegressor(self):
-        train = self.train.loc[:, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]]
+        train = self.train.loc[
+            :, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]
+        ]
         test = self.test.loc[:, ["latitude", "longitude", "year", "week_no", "k_Means"]]
         n_clusters = train["k_Means"].unique()
         cat_params = {
@@ -57,8 +62,8 @@ class model:
 
             catboost_reg = CatBoostRegressor(**cat_params)
             catboost_reg.fit(X, y)
-            if 'emission' in test_c.columns:
-                test_c = test_c.drop(columns=['emission'])
+            if "emission" in test_c.columns:
+                test_c = test_c.drop(columns=["emission"])
             catboost_pred = catboost_reg.predict(test_c)
 
             test.loc[test["k_Means"] == i, "emission"] = catboost_pred
@@ -74,9 +79,7 @@ class model:
         rnr = RadiusNeighborsRegressor(radius=0)
         rnr.fit(X, y)
         rnr_pred = rnr.predict(test)
-
         test["emission"] = rnr_pred * 1.1
-
         self.ans = test.loc[:, ["emission"]]
 
     def KNeighborsRegressor(self):
@@ -86,44 +89,85 @@ class model:
         y = train["emission"].copy()
 
         knr = KNeighborsRegressor(n_neighbors=3)
+
+        knr_cv_scores = list()
+        kf = KFold(n_splits=3, shuffle=True)
+        for i, (train_ix, test_ix) in enumerate(kf.split(X)):
+            X_train, X_test = X.iloc[train_ix], X.iloc[test_ix]
+            Y_train, Y_test = y.iloc[train_ix], y.iloc[test_ix]
+            knr_md = knr.fit(X_train, Y_train)
+            knr_pred = knr_md.predict(X_test)
+            knr_score_fold = mean_squared_error(Y_test, knr_pred, squared=False)
+            knr_cv_scores.append(knr_score_fold)
+        print("KNR Mean oof RMSE score is ==>", np.mean(knr_cv_scores))
+
         knr.fit(X, y)
         knr_pred = knr.predict(test)
-
         test["emission"] = knr_pred * 1.1
-
         self.ans = test.loc[:, ["emission"]]
 
     def RandomForestRegressor(self):
         # train = self.train[self.train['year'] != 2020]
-        train = self.train.loc[:, ["latitude", "longitude", "year", "week_no", "emission"]]
+        train = self.train.loc[
+            :, ["latitude", "longitude", "year", "week_no", "emission"]
+        ]
         test = self.test.loc[:, ["latitude", "longitude", "year", "week_no"]]
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
-        rfr = RandomForestRegressor(min_samples_leaf=6)
+        # scores = cross_val_score(RandomForestRegressor(), X, y, cv=3, scoring="neg_root_mean_squared_error")
+        # print(scores)
+        # print("RMSE: %0.2f (+/- %0.2f)" % (-scores.mean(), scores.std() * 2))
+
+        rf_cv_scores = list()
+        kf = KFold(n_splits=3, shuffle=True)
+        for i, (train_ix, test_ix) in enumerate(kf.split(X)):
+            X_train, X_test = X.iloc[train_ix], X.iloc[test_ix]
+            Y_train, Y_test = y.iloc[train_ix], y.iloc[test_ix]
+            rf_md = RandomForestRegressor().fit(X_train, Y_train)
+            rf_pred = rf_md.predict(X_test)
+            rf_score_fold = mean_squared_error(Y_test, rf_pred, squared=False)
+            rf_cv_scores.append(rf_score_fold)
+        print("RF Mean oof RMSE score is ==>", np.mean(rf_cv_scores))
+
+        rfr = RandomForestRegressor()
         rfr.fit(X, y)
         rfr_pred = rfr.predict(test)
-
         test["emission"] = rfr_pred * 1.1
-
         self.ans = test.loc[:, ["emission"]]
 
+        # scores = mean_squared_error(y, rfr.predict(X), squared=False)
+        # print("RMSE: %0.2f" % (scores))
+
     def AdaBoostRegressor(self):
-        train = self.train.loc[:, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]]
+        train = self.train.loc[
+            :, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]
+        ]
         test = self.test.loc[:, ["latitude", "longitude", "year", "week_no", "k_Means"]]
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
+        abr_cv_scores = list()
+        kf = KFold(n_splits=3, shuffle=True)
+        for i, (train_ix, test_ix) in enumerate(kf.split(X)):
+            X_train, X_test = X.iloc[train_ix], X.iloc[test_ix]
+            Y_train, Y_test = y.iloc[train_ix], y.iloc[test_ix]
+            abr_md = AdaBoostRegressor().fit(X_train, Y_train)
+            abr_pred = abr_md.predict(X_test)
+            abr_score_fold = mean_squared_error(Y_test, abr_pred, squared=False)
+            abr_cv_scores.append(abr_score_fold)
+        print("ABR Mean oof RMSE score is ==>", np.mean(abr_cv_scores))
+
         abr = AdaBoostRegressor()
         abr.fit(X, y)
         abr_pred = abr.predict(test)
-
         test["emission"] = abr_pred * 1.1
-
         self.ans = test.loc[:, ["emission"]]
 
     def LinearRegression(self):
-        train = self.train.loc[:, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]]
+        train = self.train.loc[
+            :, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]
+        ]
         test = self.test.loc[:, ["latitude", "longitude", "year", "week_no", "k_Means"]]
         clusters = train["k_Means"].unique()
         for i in clusters:
@@ -134,8 +178,8 @@ class model:
 
             lr = LinearRegression(n_jobs=-1)
             lr.fit(X, y)
-            if 'emission' in test_c.columns:
-                test_c = test_c.drop(columns=['emission'])
+            if "emission" in test_c.columns:
+                test_c = test_c.drop(columns=["emission"])
             lr_pred = lr.predict(test_c)
 
             test.loc[test["k_Means"] == i, "emission"] = lr_pred
@@ -143,7 +187,9 @@ class model:
         self.ans = test.loc[:, ["emission"]]
 
     def SupportVectorRegressor(self):
-        train = self.train.loc[:, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]]
+        train = self.train.loc[
+            :, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]
+        ]
         test = self.test.loc[:, ["latitude", "longitude", "year", "week_no", "k_Means"]]
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
@@ -159,39 +205,66 @@ class model:
         self.ans = test.loc[:, ["emission"]]
 
     def DecisionTreeRegressor(self):
-        train = self.train.loc[:, ["latitude", "longitude", "year", "week_no", "emission"]]
+        train = self.train.loc[
+            :, ["latitude", "longitude", "year", "week_no", "emission"]
+        ]
         test = self.test.loc[:, ["latitude", "longitude", "year", "week_no"]]
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
         dtr = DecisionTreeRegressor(min_samples_leaf=3, min_samples_split=4)
+
+        dtr_cv_scores = list()
+        kf = KFold(n_splits=3, shuffle=True)
+        for i, (train_ix, test_ix) in enumerate(kf.split(X)):
+            X_train, X_test = X.iloc[train_ix], X.iloc[test_ix]
+            Y_train, Y_test = y.iloc[train_ix], y.iloc[test_ix]
+            dtr_md = dtr.fit(X_train, Y_train)
+            dtr_pred = dtr_md.predict(X_test)
+            dtr_score_fold = mean_squared_error(Y_test, dtr_pred, squared=False)
+            dtr_cv_scores.append(dtr_score_fold)
+        print("DTR Mean oof RMSE score is ==>", np.mean(dtr_cv_scores))
+
         dtr.fit(X, y)
         dtr_pred = dtr.predict(test)
-
         test["emission"] = dtr_pred * 1.072
-
         self.ans = test.loc[:, ["emission"]]
 
     def XGBoostRegressor(self):
-        train = self.train.loc[:, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]]
+        train = self.train.loc[
+            :, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]
+        ]
         test = self.test.loc[:, ["latitude", "longitude", "year", "week_no", "k_Means"]]
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
+        xgb_cv_scores = list()
+        kf = KFold(n_splits=3, shuffle=True)
+        for i, (train_ix, test_ix) in enumerate(kf.split(X)):
+            X_train, X_test = X.iloc[train_ix], X.iloc[test_ix]
+            Y_train, Y_test = y.iloc[train_ix], y.iloc[test_ix]
+            xgb_md = XGBRegressor().fit(X_train, Y_train)
+            xgb_pred = xgb_md.predict(X_test)
+            xgb_score_fold = mean_squared_error(Y_test, xgb_pred, squared=False)
+            xgb_cv_scores.append(xgb_score_fold)
+        print("XGB Mean oof RMSE score is ==>", np.mean(xgb_cv_scores))
+
         xgb = XGBRegressor()
         xgb.fit(X, y)
         xgb_pred = xgb.predict(test)
-
         test["emission"] = xgb_pred * 1.1
-
         self.ans = test.loc[:, ["emission"]]
 
     def FixPrediction(self):
         train = self.train
         test = self.test
         ans = self.ans
-        ans[ans['emission'] < 0] = 0
-        zero_emissions = train.groupby(['latitude', 'longitude'])['emission'].mean().to_frame()
-        zero_emissions = zero_emissions[zero_emissions['emission'] == 0]
-        mask = test.apply(lambda x: (x['latitude'], x['longitude']) in zero_emissions.index, axis=1)
+        ans[ans["emission"] < 0] = 0
+        zero_emissions = (
+            train.groupby(["latitude", "longitude"])["emission"].mean().to_frame()
+        )
+        zero_emissions = zero_emissions[zero_emissions["emission"] == 0]
+        mask = test.apply(
+            lambda x: (x["latitude"], x["longitude"]) in zero_emissions.index, axis=1
+        )
         ans.loc[mask, "emission"] = 0
