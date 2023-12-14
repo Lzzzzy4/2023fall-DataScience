@@ -12,39 +12,40 @@ train = pd.read_csv(data_path + "train.csv")
 test = pd.read_csv(data_path + "test.csv")
 ans = pd.read_csv(data_path + "ans.csv")
 
-methods_pre_process = ["Brute"]
+methods_pre_process = ["KMeans"]
 methods_model = [
-    "CatBoostRegressor",
-    "RadiusNeighborsRegressor",
-    "KNeighborsRegressor",
-    "RandomForestRegressor",
+    # "CatBoostRegressor",
+    # "RadiusNeighborsRegressor",
+    # "KNeighborsRegressor",
+    # "RandomForestRegressor",
+    # "AdaBoostRegressor",
+    "LinearRegression",
+    # "SupportVectorRegressor",
+    "DecisionTreeRegressor",
+    "XGBoostRegressor",
 ]
 methods_judge = ["mean_squared_error"]
 
 
-def run(methods_pre_process, methods_model, methods_judge):
-    # print("method_pre_process: ", methods_pre_process)
+def run(methods_pre_process, method_model, method_judge):
     p = pre_process(train, test)
     train_csv, test_csv = p.preprocsee(methods_pre_process)
 
-    # print("method_model: ", methods_model)
     m = model(train_csv, test_csv)
-    result = m.get_result(methods_model)
+    result = m.get_result(method_model)
 
-    # print("method_judge: ", methods_judge)
     j = judge(result, ans)
-    score = j.get_score(methods_judge)
+    score = j.get_score(method_judge)
 
     print("method_pre_process: ", methods_pre_process)
-    print("method_model: ", methods_model)
-    print("method_judge: ", methods_judge)
+    print("method_model: ", method_model)
+    print("method_judge: ", method_judge)
     print("score: ", score)
     print("")
 
 
 if __name__ == "__main__":
     # run('Brute', 'K-Mean', 'mean_squared_error')
-    for method_pre_process in methods_pre_process:
-        for method_model in methods_model:
-            for method_judge in methods_judge:
-                run(method_pre_process, method_model, method_judge)
+    for method_model in methods_model:
+        for method_judge in methods_judge:
+            run(methods_pre_process, method_model, method_judge)

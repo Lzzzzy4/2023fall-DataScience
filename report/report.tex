@@ -300,33 +300,37 @@ Spearman correlation: -0.06904123013729443
 
 我们无法得出该气体与CO2排放量之间有明显的相关性。类似的，我们对该地点的其他气象数据进行了计算，也未能分析出得到更多有价值的信息。
 
+Ozone\_solar\_azimuth\_angle
+
 \subsubsection{权重量化}
 
 \subsection{模型选择}
 
-这是一个回归问题，我们尝试了多种回归模型，包括线性回归、CatBoost、RandomForest、RadiusNeighbors、KNeighbors等，最终选择了CatBoost作为最终的模型。
+这是一个回归问题，我们尝试了多种回归模型，包括线性回归、逻辑回归、支持向量回归、决策树回归、类别提升、自适应提升、极端梯度提升、随机森林、半径近邻、K近邻等。
 
-% \subsubsection{线性回归}
+\subsubsection{LinearRegression（线性回归）}
 
-\subsubsection{CatBoost（类别提升）}
+\subsubsection{SupportVectorRegressor（支持向量回归）}
 
-\subsubsection{RandomForest（随机森林）}
+\subsubsection{DecisionTreeRegressor（决策树回归）}
+
+\subsubsection{CatBoostRegressor（类别提升）}
+
+\subsubsection{AdaBoostRegressor（自适应提升）}
+
+\subsubsection{XGBoostRegressor（极端梯度提升）}
+
+\subsubsection{RandomForestRegressor（随机森林）}
 
 我们使用了经纬度、年份、周数作为输入，参数设置min\_samples\_leaf=6，使用随机森林模型进行训练，得到的结果如下：
 
-\subsubsection{RadiusNeighbors（半径近邻）}
+\subsubsection{RadiusNeighborsRegressor（半径近邻）}
 
-\subsubsection{KNeighbors（K近邻）}
+\subsubsection{KNeighborsRegressor（K近邻）}
 
 % \subsubsection{MLPRegressor（多层感知器）}
 
-% \subsubsection{SVR（支持向量回归）}
-
-% \subsubsection{XGBRegressor（XGBoost回归）}
-
 % \subsubsection{LGBMRegressor（LightGBM回归）}
-
-% \subsubsection{AdaBoostRegressor（AdaBoost回归）}
 
 % \subsubsection{GradientBoostingRegressor（梯度提升回归）}
 
@@ -350,6 +354,10 @@ Spearman correlation: -0.06904123013729443
 处理后对评估结果(RMSE)有一定的提升。
 
 \section{评估}
+
+\subsubsection{交叉验证}
+
+\subsubsection{RMSE}
 
 \section{团队成员分工}
 
