@@ -122,54 +122,6 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
       \item 其余特征可以分类为 \texttt{CarbonMonoxide}，\texttt{Cloud}， \texttt{Formaldehyde}，\texttt{NitrogenDioxide}，\texttt{Ozone}，\texttt{SulphurDioxide}，\texttt{UvAerosolIndex}，\texttt{UvAerosolLayerHeight}。
 \end{itemize}
 
-\subsection{数据预处理}
-
-\subsubsection{缺失值处理}
-
-在数据预处理阶段，缺失值处理是一个重要的步骤。缺失值可能会导致统计分析的结果出现偏差，或者使得机器学习算法无法正确地工作。
-
-使用\verb|train.isnull().sum()|可以查看训练集每一列的缺失值数量，结果如表\ref{tab:1}所示。
-
-\begin{table}[h]
-      \centering
-      \begin{tabular}{l|l}
-      \hline
-      Column & Non-Null Count \\ \hline
-      \texttt{UvAerosolLayerHeight\_aerosol\_height} & 78584 \\
-      \texttt{UvAerosolLayerHeight\_solar\_zenith\_angle} & 78584 \\
-      \texttt{UvAerosolLayerHeight\_solar\_azimuth\_angle} & 78584 \\
-      \ldots{} & \\
-      \texttt{NitrogenDioxide\_tropopause\_pressure} & 18320 \\
-      \texttt{NitrogenDioxide\_stratospheric\_NO2\_column\_number\_density} & 18320 \\
-      \texttt{NitrogenDioxide\_NO2\_slant\_column\_number\_density} & 18320 \\
-      \ldots{} & \\
-      \texttt{SulphurDioxide\_SO2\_column\_number\_density\_15km} & 14609 \\
-      \texttt{SulphurDioxide\_solar\_zenith\_angle} & 14609 \\
-      \texttt{SulphurDioxide\_solar\_azimuth\_angle} & 14609 \\
-      \ldots{} & \\
-      \hline
-      \end{tabular}
-      \caption{\label{tab:1}缺失值概览}
-\end{table}
-
-虽然某些机器学习算法，如决策树和随机森林，可以直接处理缺失值，但由于后续模型还未确定，故还是在此对缺失值进行处理。对于缺失值较多的列，如\texttt{UvAerosolLayerHeight}，缺失率达到99\%，我们可以考虑直接删除。对于缺失值较少的列，我们可以考虑使用均值填充。
-
-对于测试集，我们可以进行类似缺失值处理操作。
-
-\subsubsection{数据归一化}
-
-数据归一化是一种常用的数据预处理技术，用于将数据转换到一个公共的尺度。这种技术在机器学习和数据挖掘中非常常见，因为许多算法（如神经网络）对输入数据的尺度和分布有一定的假设。
-
-数据归一化通常涉及将数值特征缩放到一个固定的范围（如0到1），或者将它们转换为具有零均值和单位方差的值。这样可以确保所有特征在模型训练过程中具有相同的重要性，而不会因为它们的尺度不同而被赋予不同的权重。
-
-可以使用 \texttt{sklearn.preprocessing} 模块中的 \texttt{MinMaxScaler} 或 \texttt{StandardScaler} 类来进行数据归一化，代码如下：
-
-\begin{lstlisting}[style=Python]
-      from sklearn.preprocessing import StandardScaler
-      scaler = StandardScaler()
-      train = scaler.fit_transform(train)
-\end{lstlisting}
-
 \subsection{特征分析}
 
 \subsubsection{年份与周数}
@@ -220,12 +172,18 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 
 \subsubsection{关于时间和空间的总结}
 
-作出各个地点以周为单位的碳排放量变化如下：
+作出各个地点以周为单位的碳排放量图以及相对变化量如下：
+
+\begin{figure}[H]
+      \centering
+      \includegraphics[width=0.8\textwidth]{output8.png}
+      \caption{各地点排放量关于周数的折线图}
+\end{figure}
 
 \begin{figure}[H]
       \centering
       \includegraphics[width=0.8\textwidth]{output6.png}
-      \caption{各地点排放量关于周数的折线图}
+      \caption{排放量相对变化量}
 \end{figure}
 
 建模可以大致从以下方面入手：
@@ -302,7 +260,55 @@ Spearman correlation: -0.06904123013729443
 
 Ozone\_solar\_azimuth\_angle
 
-\subsubsection{权重量化}
+% \subsubsection{权重量化}
+
+\subsection{数据预处理}
+
+\subsubsection{缺失值处理}
+
+在数据预处理阶段，缺失值处理是一个重要的步骤。缺失值可能会导致统计分析的结果出现偏差，或者使得机器学习算法无法正确地工作。
+
+使用\verb|train.isnull().sum()|可以查看训练集每一列的缺失值数量，结果如表\ref{tab:1}所示。
+
+\begin{table}[h]
+      \centering
+      \begin{tabular}{l|l}
+      \hline
+      Column & Non-Null Count \\ \hline
+      \texttt{UvAerosolLayerHeight\_aerosol\_height} & 78584 \\
+      \texttt{UvAerosolLayerHeight\_solar\_zenith\_angle} & 78584 \\
+      \texttt{UvAerosolLayerHeight\_solar\_azimuth\_angle} & 78584 \\
+      \ldots{} & \\
+      \texttt{NitrogenDioxide\_tropopause\_pressure} & 18320 \\
+      \texttt{NitrogenDioxide\_stratospheric\_NO2\_column\_number\_density} & 18320 \\
+      \texttt{NitrogenDioxide\_NO2\_slant\_column\_number\_density} & 18320 \\
+      \ldots{} & \\
+      \texttt{SulphurDioxide\_SO2\_column\_number\_density\_15km} & 14609 \\
+      \texttt{SulphurDioxide\_solar\_zenith\_angle} & 14609 \\
+      \texttt{SulphurDioxide\_solar\_azimuth\_angle} & 14609 \\
+      \ldots{} & \\
+      \hline
+      \end{tabular}
+      \caption{\label{tab:1}缺失值概览}
+\end{table}
+
+虽然某些机器学习算法，如决策树和随机森林，可以直接处理缺失值，但由于后续模型还未确定，故还是在此对缺失值进行处理。对于缺失值较多的列，如\texttt{UvAerosolLayerHeight}，缺失率达到99\%，我们可以考虑直接删除。对于缺失值较少的列，我们可以考虑使用均值填充。
+
+对于测试集，我们可以进行类似缺失值处理操作。
+
+\subsubsection{数据归一化}
+
+数据归一化是一种常用的数据预处理技术，用于将数据转换到一个公共的尺度。这种技术在机器学习和数据挖掘中非常常见，因为许多算法（如神经网络）对输入数据的尺度和分布有一定的假设。
+
+数据归一化通常涉及将数值特征缩放到一个固定的范围（如0到1），或者将它们转换为具有零均值和单位方差的值。这样可以确保所有特征在模型训练过程中具有相同的重要性，而不会因为它们的尺度不同而被赋予不同的权重。
+
+可以使用 \texttt{sklearn.preprocessing} 模块中的 \texttt{MinMaxScaler} 或 \texttt{StandardScaler} 类来进行数据归一化，代码如下：
+
+\begin{lstlisting}[style=Python]
+      from sklearn.preprocessing import StandardScaler
+      scaler = StandardScaler()
+      train = scaler.fit_transform(train)
+\end{lstlisting}
 
 \subsection{模型选择}
 

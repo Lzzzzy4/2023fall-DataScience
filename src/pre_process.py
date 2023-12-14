@@ -84,3 +84,7 @@ class pre_process:
 
         self.train = train
         self.test = test
+
+    def porcess_2020(self):
+        pass
+
