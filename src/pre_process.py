@@ -1,7 +1,7 @@
-from math import e
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
 
 
 class pre_process:
@@ -9,16 +9,10 @@ class pre_process:
         self.train = train
         self.test = test
 
-    def preprocsee(self, method: str):
-        for m in method:
-            if m == "KMeans":
-                self.KMeans()
-            elif m == "Rot_15":
-                self.Rot_15()
-            elif m == "Rot_30":
-                self.Rot_30()
-            else:
-                raise Exception("pre_process: No such method")
+    def preprocsee(self, methods):
+        for method in methods:
+            assert hasattr(self, method), f"pre_process: No such method {method}"
+            getattr(self, method)()
 
         return (self.train, self.test)
 
@@ -52,18 +46,15 @@ class pre_process:
         train["rot_15_y"] = train["latitude"] * np.cos(np.pi / 12) + train[
             "longitude"
         ] * np.sin(np.pi / 12)
-        train["rot_15_x"] = train["longitude"] * np.cos(np.pi / 12) - train[
+        train["rot_15_x"] = train["longitude"] * np.cos(np.pi / 12) + train[
             "latitude"
         ] * np.sin(np.pi / 12)
         test["rot_15_y"] = test["latitude"] * np.cos(np.pi / 12) + test[
             "longitude"
         ] * np.sin(np.pi / 12)
-        test["rot_15_x"] = test["longitude"] * np.cos(np.pi / 12) - test[
+        test["rot_15_x"] = test["longitude"] * np.cos(np.pi / 12) + test[
             "latitude"
         ] * np.sin(np.pi / 12)
-
-        self.train = train
-        self.test = test
 
     def Rot_30(self):
         train = self.train
@@ -72,19 +63,52 @@ class pre_process:
         train["rot_30_y"] = train["latitude"] * np.cos(np.pi / 6) + train[
             "longitude"
         ] * np.sin(np.pi / 6)
-        train["rot_30_x"] = train["longitude"] * np.cos(np.pi / 6) - train[
+        train["rot_30_x"] = train["longitude"] * np.cos(np.pi / 6) + train[
             "latitude"
         ] * np.sin(np.pi / 6)
         test["rot_30_y"] = test["latitude"] * np.cos(np.pi / 6) + test[
             "longitude"
         ] * np.sin(np.pi / 6)
-        test["rot_30_x"] = test["longitude"] * np.cos(np.pi / 6) - test[
+        test["rot_30_x"] = test["longitude"] * np.cos(np.pi / 6) + test[
             "latitude"
         ] * np.sin(np.pi / 6)
+
+    def Dist_Rwanda(self):
+        rwanda_center = (-1.9607, 29.9707)
+        train = self.train
+        test = self.test
+
+        train["dist_rwanda"] = np.sqrt(
+            (train["latitude"] - rwanda_center[0]) ** 2
+            + (train["longitude"] - rwanda_center[1]) ** 2
+        )
+        test["dist_rwanda"] = np.sqrt(
+            (test["latitude"] - rwanda_center[0]) ** 2
+            + (test["longitude"] - rwanda_center[1]) ** 2
+        )
+
+    def Fillna(self):
+        train = self.train
+        test = self.test
+
+        good_col = 'Ozone_solar_azimuth_angle'
+        train[good_col] = train.groupby(['id', 'year'])[good_col].ffill().bfill()
+        test[good_col] = test.groupby(['id', 'year'])[good_col].ffill().bfill()
+
+        train = train.fillna(train.mean())
+        test = test.fillna(test.mean())
 
         self.train = train
         self.test = test
 
     def porcess_2020(self):
         pass
+    
+    def Standardize(self):
+        train = self.train
+        test = self.test
 
+        scaler = StandardScaler()
+        scaler.fit(train)
+        train = scaler.transform(train)
+        test = scaler.transform(test)

@@ -15,6 +15,7 @@ from sklearn.ensemble import AdaBoostRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.model_selection import GridSearchCV
 from xgboost import XGBRegressor
 
 
@@ -23,45 +24,29 @@ class model:
         self.train = train
         self.test = test
 
-    def get_result(self, method):
-        if method == "CatBoostRegressor":
-            self.CatBoostRegressor()
-        elif method == "RadiusNeighborsRegressor":
-            self.RadiusNeighborsRegressor()
-        elif method == "KNeighborsRegressor":
-            self.KNeighborsRegressor()
-        elif method == "RandomForestRegressor":
-            self.RandomForestRegressor()
-        elif method == "AdaBoostRegressor":
-            self.AdaBoostRegressor()
-        elif method == "LinearRegression":
-            self.LinearRegression()
-        elif method == "SupportVectorRegressor":
-            self.SupportVectorRegressor()
-        elif method == "DecisionTreeRegressor":
-            self.DecisionTreeRegressor()
-        elif method == "XGBoostRegressor":
-            self.XGBoostRegressor()
-        else:
-            raise Exception("model: No such method")
+    def get_result(self, model):
+        assert hasattr(self, model), f"pre_process: No such model {model}"
+        getattr(self, model)()
+
         self.FixPrediction()
         return self.ans
 
     def CatBoostRegressor(self):
         train = self.train
         test = self.test
-        clusters = train["k_Means"].unique()
+        n_clusters = train["k_Means"].unique()
         cat_params = {
-            "n_estimators": 799,
-            "learning_rate": 0.09180872710592884,
-            "depth": 8,
-            "l2_leaf_reg": 1.0242996861886846,
-            "subsample": 0.38227256755249117,
-            "colsample_bylevel": 0.7183481537623551,
-            "random_state": 42,
+            "n_estimators": 250,
+            "learning_rate": 0.95,
+            # "learning_rate": 0.09180872710592884,
+            # "depth": 8,
+            # "l2_leaf_reg": 1.0242996861886846,
+            # "subsample": 0.38227256755249117,
+            # "colsample_bylevel": 0.7183481537623551,
+            # "random_state": 42,
             "silent": True,
         }
-        for i in clusters:
+        for i in n_clusters:
             train_c = train[train["k_Means"] == i]
             test_c = test[test["k_Means"] == i].drop(columns=["k_Means"])
             X = train_c.drop(columns=["emission", "k_Means"])
@@ -144,7 +129,7 @@ class model:
             X = train_c.drop(columns=["emission", "k_Means"])
             y = train_c["emission"].copy()
 
-            lr = LinearRegression()
+            lr = LinearRegression(n_jobs=-1)
             lr.fit(X, y)
             if 'emission' in test_c.columns:
                 test_c = test_c.drop(columns=['emission'])
@@ -174,11 +159,11 @@ class model:
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
-        dtr = DecisionTreeRegressor()
+        dtr = DecisionTreeRegressor(min_samples_leaf=3, min_samples_split=4)
         dtr.fit(X, y)
         dtr_pred = dtr.predict(test)
 
-        test["emission"] = dtr_pred * 1.1
+        test["emission"] = dtr_pred * 1.072
 
         self.ans = test.loc[:, ["emission"]]
 

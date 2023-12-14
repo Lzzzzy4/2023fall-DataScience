@@ -116,6 +116,8 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 
 \begin{itemize}
       \item 数据集共有79023行，76列，其中75列为特征，1列为预测值。
+      \item 只有数字特征特征（不包括用于索引的特征）。
+      \item 训练数据在2019-2021年间测量。
       \item 除经纬度外其余值均为 \texttt{float64}，不需要做额外数据处理。
       \item 部分测试量包含空值，可以进行缺失值处理。
       \item 可用作索引的值有 \texttt{latitude}，\texttt{longitude}，\texttt{year} \texttt{week\_no}，需预测值为 \texttt{emission}
@@ -172,6 +174,13 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 
 \subsubsection{关于时间和空间的总结}
 
+\begin{itemize}
+      \item 共有497个不同位置的排放数据。
+      \item 排放量与季节有很强的依赖性。
+      \item 有2个位置的排放量特别大。
+      \item 测试集与训练集位置相同。
+\end{itemize}
+
 作出各个地点以周为单位的碳排放量图以及相对变化量如下：
 
 \begin{figure}[H]
@@ -185,6 +194,16 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
       \includegraphics[width=0.8\textwidth]{output6.png}
       \caption{排放量相对变化量}
 \end{figure}
+
+作出各个地点每周碳排放量相比第0周的变化如下：
+
+\begin{figure}[H]
+      \centering
+      \includegraphics[width=0.8\textwidth]{output6.png}
+      \caption{各地点每周碳排放量相比第0周的折线图}
+\end{figure}
+
+可以看出有很强的周期性。
 
 建模可以大致从以下方面入手：
 
@@ -361,9 +380,35 @@ Ozone\_solar\_azimuth\_angle
 
 \section{评估}
 
-\subsubsection{交叉验证}
+\subsection{RMSE}
 
-\subsubsection{RMSE}
+RMSE（Root Mean Square Error，均方根误差）是一种常用的评估回归模型性能的指标。它是观测值与真实值偏差的平方和的平均值的平方根。RMSE 的值越小，说明模型的预测性能越好。在 Python 中，可以使用 scikit-learn 库的 `mean\_squared\_error` 函数计算 RMSE，代码如下：
+
+\begin{lstlisting}[style=Python]
+      def mean_squared_error(self):
+      rmse = mean_squared_error(
+          self.test["emission"], self.ans["emission"], squared=False
+      )
+      return rmse
+\end{lstlisting}
+
+\subsection{交叉验证}
+
+交叉验证是一种评估模型性能的统计学方法。它的基本思想是将原始数据集分成两部分（训练集和验证集），然后在训练集上训练模型，在验证集上验证模型的性能。这个过程重复多次，每次都用不同的训练集和验证集，最后取平均值作为模型的最终性能。交叉验证的主要优点是它可以利用有限的数据获得模型在未知数据上的性能的更准确的估计。
+
+在 Python 中，可以使用 scikit-learn 库的 cross\_val\_score 函数进行交叉验证，代码如下：
+
+\begin{lstlisting}[style=Python]
+      from sklearn.model_selection import cross_val_score
+      scores = cross_val_score(model, X, y, cv=5, scoring='neg_mean_squared_error')
+      print("RMSE: %0.2f (+/- %0.2f)" % (-scores.mean(), scores.std() * 2))
+\end{lstlisting}
+
+\subsection{预测结果可视化}
+
+\subsection{最终得分}
+
+
 
 \section{团队成员分工}
 
@@ -375,10 +420,12 @@ Ozone\_solar\_azimuth\_angle
 
 \section{总结与感悟}
 
-\ctexset{bibname=参考文献}
+\ctexset{bibname=参考资料}
 \begin{thebibliography}{100}
 \bibitem{ref1}\href{https://www.kaggle.com/code/ambrosm/pss3e20-eda-which-makes-sense}{PSS3E20 EDA which makes sense}
 \bibitem{ref2}\href{https://www.kaggle.com/code/kacperrabczewski/rwanda-co2-step-by-step-guide}{Rwanda CO2: Step by step guide}
+\bibitem{ref3}\href{https://www.kaggle.com/code/yaaangzhou/pg-s3-e20-eda-modeling}{[PG S3 E20] EDA + Modeling}
+\bibitem{ref3}\href{https://www.kaggle.com/code/dmitryuarov/ps3e20-rwanda-emission-advanced-fe-20-88}{PS3E20 | Rwanda emission | Advanced FE | 20.88}
 \end{thebibliography}
 
 \end{document}
