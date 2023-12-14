@@ -25,9 +25,10 @@ from sklearn.model_selection import KFold
 
 
 class model:
-    def __init__(self, train: pd.DataFrame, test: pd.DataFrame):
-        self.train = train
-        self.test = test
+    def __init__(self, train, test):
+        use_feature = ["latitude", "longitude", "year", "week_no", "k_Means"]
+        self.train = train.loc[:, use_feature + ["emission"]]
+        self.test = test.loc[:, use_feature]
 
     def get_result(self, model):
         assert hasattr(self, model), f"pre_process: No such model {model}"
@@ -37,21 +38,19 @@ class model:
         return self.ans
 
     def CatBoostRegressor(self):
-        train = self.train.loc[
-            :, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]
-        ]
-        test = self.test.loc[:, ["latitude", "longitude", "year", "week_no", "k_Means"]]
+        train = self.train
+        test = self.test
         n_clusters = train["k_Means"].unique()
         cat_params = {
-            # "n_estimators": 250,
-            # "learning_rate": 0.95,
-            "n_estimators": 799,
-            "learning_rate": 0.09180872710592884,
-            "depth": 8,
-            "l2_leaf_reg": 1.0242996861886846,
-            "subsample": 0.38227256755249117,
-            "colsample_bylevel": 0.7183481537623551,
-            "random_state": 42,
+            "n_estimators": 250,
+            "learning_rate": 0.95,
+            # "n_estimators": 799,
+            # "learning_rate": 0.09180872710592884,
+            # "depth": 8,
+            # "l2_leaf_reg": 1.0242996861886846,
+            # "subsample": 0.38227256755249117,
+            # "colsample_bylevel": 0.7183481537623551,
+            # "random_state": 42,
             "silent": True,
         }
         for i in n_clusters:
@@ -62,11 +61,11 @@ class model:
 
             catboost_reg = CatBoostRegressor(**cat_params)
             catboost_reg.fit(X, y)
-            if "emission" in test_c.columns:
-                test_c = test_c.drop(columns=["emission"])
+            # if "emission" in test_c.columns:
+            #     test_c = test_c.drop(columns=["emission"])
             catboost_pred = catboost_reg.predict(test_c)
 
-            test.loc[test["k_Means"] == i, "emission"] = catboost_pred
+            test.loc[test["k_Means"] == i, "emission"] = catboost_pred * 1.1
 
         self.ans = test.loc[:, ["emission"]]
 
@@ -83,8 +82,8 @@ class model:
         self.ans = test.loc[:, ["emission"]]
 
     def KNeighborsRegressor(self):
-        train = self.train.loc[:, ["latitude", "longitude", "week_no", "emission"]]
-        test = self.test.loc[:, ["latitude", "longitude", "week_no"]]
+        train = self.train
+        test = self.test
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
@@ -108,10 +107,8 @@ class model:
 
     def RandomForestRegressor(self):
         # train = self.train[self.train['year'] != 2020]
-        train = self.train.loc[
-            :, ["latitude", "longitude", "year", "week_no", "emission"]
-        ]
-        test = self.test.loc[:, ["latitude", "longitude", "year", "week_no"]]
+        train = self.train
+        test = self.test
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
@@ -140,10 +137,8 @@ class model:
         # print("RMSE: %0.2f" % (scores))
 
     def AdaBoostRegressor(self):
-        train = self.train.loc[
-            :, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]
-        ]
-        test = self.test.loc[:, ["latitude", "longitude", "year", "week_no", "k_Means"]]
+        train = self.train
+        test = self.test
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
@@ -165,10 +160,8 @@ class model:
         self.ans = test.loc[:, ["emission"]]
 
     def LinearRegression(self):
-        train = self.train.loc[
-            :, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]
-        ]
-        test = self.test.loc[:, ["latitude", "longitude", "year", "week_no", "k_Means"]]
+        train = self.train
+        test = self.test
         clusters = train["k_Means"].unique()
         for i in clusters:
             train_c = train[train["k_Means"] == i]
@@ -187,10 +180,8 @@ class model:
         self.ans = test.loc[:, ["emission"]]
 
     def SupportVectorRegressor(self):
-        train = self.train.loc[
-            :, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]
-        ]
-        test = self.test.loc[:, ["latitude", "longitude", "year", "week_no", "k_Means"]]
+        train = self.train
+        test = self.test
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
         # scaler = StandardScaler().fit(X)
@@ -205,10 +196,8 @@ class model:
         self.ans = test.loc[:, ["emission"]]
 
     def DecisionTreeRegressor(self):
-        train = self.train.loc[
-            :, ["latitude", "longitude", "year", "week_no", "emission"]
-        ]
-        test = self.test.loc[:, ["latitude", "longitude", "year", "week_no"]]
+        train = self.train
+        test = self.test
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
@@ -231,10 +220,8 @@ class model:
         self.ans = test.loc[:, ["emission"]]
 
     def XGBoostRegressor(self):
-        train = self.train.loc[
-            :, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]
-        ]
-        test = self.test.loc[:, ["latitude", "longitude", "year", "week_no", "k_Means"]]
+        train = self.train
+        test = self.test
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
