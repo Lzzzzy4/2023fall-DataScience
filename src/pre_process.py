@@ -116,6 +116,15 @@ class pre_process:
         numeric_cols = test.columns.drop("ID_LAT_LON_YEAR_WEEK")
         test[numeric_cols] = test[numeric_cols].fillna(test[numeric_cols].mean())
 
+    def process_2020_drop(self):
+        train = self.train
+        self.train = train[(train.year == 2019) |
+                       (train.year == 2020) & (train.week_no <= 8) |
+                       (train.year == 2021) & (train.week_no > 8)]
+        
+    def process_2020_fix(self):
+        pass
+    
     def Standardize(self):
         train = self.train
         test = self.test
