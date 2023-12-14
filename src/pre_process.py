@@ -1,4 +1,3 @@
-from math import e
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
@@ -10,18 +9,10 @@ class pre_process:
         self.train = train
         self.test = test
 
-    def preprocsee(self, method: str):
-        for m in method:
-            if m == "KMeans":
-                self.KMeans()
-            elif m == "Rot_15":
-                self.Rot_15()
-            elif m == "Rot_30":
-                self.Rot_30()
-            elif m == "Dist_Rwanda":
-                self.Dist_Rwanda()
-            else:
-                raise Exception("pre_process: No such method")
+    def preprocsee(self, methods):
+        for method in methods:
+            assert hasattr(self, method), f"pre_process: No such method {method}"
+            getattr(self, method)()
 
         return (self.train, self.test)
 

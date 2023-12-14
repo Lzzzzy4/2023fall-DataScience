@@ -24,27 +24,10 @@ class model:
         self.train = train
         self.test = test
 
-    def get_result(self, method):
-        if method == "CatBoostRegressor":
-            self.CatBoostRegressor()
-        elif method == "RadiusNeighborsRegressor":
-            self.RadiusNeighborsRegressor()
-        elif method == "KNeighborsRegressor":
-            self.KNeighborsRegressor()
-        elif method == "RandomForestRegressor":
-            self.RandomForestRegressor()
-        elif method == "AdaBoostRegressor":
-            self.AdaBoostRegressor()
-        elif method == "LinearRegression":
-            self.LinearRegression()
-        elif method == "SupportVectorRegressor":
-            self.SupportVectorRegressor()
-        elif method == "DecisionTreeRegressor":
-            self.DecisionTreeRegressor()
-        elif method == "XGBoostRegressor":
-            self.XGBoostRegressor()
-        else:
-            raise Exception("model: No such method")
+    def get_result(self, model):
+        assert hasattr(self, model), f"pre_process: No such model {model}"
+        getattr(self, model)()
+
         self.FixPrediction()
         return self.ans
 
