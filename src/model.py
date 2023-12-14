@@ -145,12 +145,11 @@ class model:
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
-        svr = SVR()
+        svr = SVR(max_iter=1000)
         svr.fit(X, y)
         svr_pred = svr.predict(test)
 
-        test["emission"] = svr_pred * 1.1
-
+        test["emission"] = svr_pred
         self.ans = test.loc[:, ["emission"]]
 
     def DecisionTreeRegressor(self):
