@@ -12,7 +12,14 @@ train = pd.read_csv(data_path + "train.csv")
 test = pd.read_csv(data_path + "test.csv")
 ans = pd.read_csv(data_path + "ans.csv")
 
-methods_pre_process = ["Fillna", "Standardize", "KMeans", "Rot_15", "Rot_30", "Dist_Rwanda"]
+methods_pre_process = [
+    # "Fillna",
+    # "Standardize",
+    "KMeans",
+    "Rot_15",
+    "Rot_30",
+    "Dist_Rwanda",
+]
 methods_model = [
     # "CatBoostRegressor",
     # "RadiusNeighborsRegressor",
@@ -29,7 +36,7 @@ methods_judge = ["mean_squared_error"]
 
 def run(methods_pre_process, method_model, method_judge):
     p = pre_process(train, test)
-    train_csv, test_csv = p.preprocsee(methods_pre_process)
+    train_csv, test_csv = p.preprocess(methods_pre_process)
 
     m = model(train_csv, test_csv)
     result = m.get_result(method_model)

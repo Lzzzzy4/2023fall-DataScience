@@ -349,13 +349,9 @@ Ozone\_solar\_azimuth\_angle
 
 \subsubsection{KNeighborsRegressor（K近邻）}
 
-% \subsubsection{MLPRegressor（多层感知器）}
-
 % \subsubsection{LGBMRegressor（LightGBM回归）}
 
-% \subsubsection{GradientBoostingRegressor（梯度提升回归）}
-
-\subsection{结果处理}
+\subsection{结果优化}
 
 显然，预测出的CO2排放量不可能为负数，因此我们将预测出的负数值置为0。
 
@@ -389,6 +385,8 @@ RMSE（Root Mean Square Error，均方根误差）是一种常用的评估回归
 \end{lstlisting}
 
 \subsection{交叉验证}
+
+TODO
 
 交叉验证是一种评估模型性能的统计学方法。它的基本思想是将原始数据集分成两部分（训练集和验证集），然后在训练集上训练模型，在验证集上验证模型的性能。这个过程重复多次，每次都用不同的训练集和验证集，最后取平均值作为模型的最终性能。交叉验证的主要优点是它可以利用有限的数据获得模型在未知数据上的性能的更准确的估计。
 

@@ -79,8 +79,8 @@ class model:
         self.ans = test.loc[:, ["emission"]]
 
     def RadiusNeighborsRegressor(self):
-        train = self.train.loc[:, ["latitude", "longitude", "week_no", "emission"]]
-        test = self.test.loc[:, ["latitude", "longitude", "week_no"]]
+        train = self.train.loc[:, ["latitude", "longitude", "week_no", "emission", 'Ozone_solar_azimuth_angle', "dist_rwanda"]]
+        test = self.test.loc[:, ["latitude", "longitude", "week_no", 'Ozone_solar_azimuth_angle', "dist_rwanda"]]
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
