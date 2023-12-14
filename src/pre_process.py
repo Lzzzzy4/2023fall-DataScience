@@ -107,20 +107,19 @@ class pre_process:
         train[good_col] = train.groupby(['year'])[good_col].ffill().bfill()
         test[good_col] = test.groupby(['year'])[good_col].ffill().bfill()
 
-        # try:
-        #     train = train.fillna(train.mean())
-        #     test = test.fillna(test.mean())
-        # except:
-        #     pass
+        numeric_cols = train.columns.drop("ID_LAT_LON_YEAR_WEEK")
+        train[numeric_cols] = train[numeric_cols].fillna(train[numeric_cols].mean())
 
-        self.train = train
-        self.test = test
+        numeric_cols = test.columns.drop("ID_LAT_LON_YEAR_WEEK")
+        test[numeric_cols] = test[numeric_cols].fillna(test[numeric_cols].mean())
 
     def Standardize(self):
         train = self.train
         test = self.test
-
         scaler = StandardScaler()
-        scaler.fit(train)
-        train = scaler.transform(train)
-        test = scaler.transform(test)
+
+        numeric_cols = train.columns.drop("ID_LAT_LON_YEAR_WEEK")
+        train[numeric_cols] = scaler.fit_transform(train[numeric_cols])
+
+        numeric_cols = test.columns.drop("ID_LAT_LON_YEAR_WEEK")
+        test[numeric_cols] = scaler.fit_transform(test[numeric_cols])
