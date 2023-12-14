@@ -51,18 +51,19 @@ class model:
     def CatBoostRegressor(self):
         train = self.train
         test = self.test
-        clusters = train["k_Means"].unique()
+        n_clusters = train["k_Means"].unique()
         cat_params = {
-            "n_estimators": 799,
-            "learning_rate": 0.09180872710592884,
-            "depth": 8,
-            "l2_leaf_reg": 1.0242996861886846,
-            "subsample": 0.38227256755249117,
-            "colsample_bylevel": 0.7183481537623551,
-            "random_state": 42,
+            "n_estimators": 250,
+            "learning_rate": 0.95,
+            # "learning_rate": 0.09180872710592884,
+            # "depth": 8,
+            # "l2_leaf_reg": 1.0242996861886846,
+            # "subsample": 0.38227256755249117,
+            # "colsample_bylevel": 0.7183481537623551,
+            # "random_state": 42,
             "silent": True,
         }
-        for i in clusters:
+        for i in n_clusters:
             train_c = train[train["k_Means"] == i]
             test_c = test[test["k_Means"] == i].drop(columns=["k_Means"])
             X = train_c.drop(columns=["emission", "k_Means"])
