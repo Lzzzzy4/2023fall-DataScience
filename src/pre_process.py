@@ -21,8 +21,8 @@ class pre_process:
                 self.Dist_Rwanda()
             elif m == "Fillna":
                 self.Fillna()
-            elif m == "Standardize":
-                self.Standardize()
+            elif m == "process_2020":
+                self.process_2020()
             else:
                 raise Exception("pre_process: No such method")
 
@@ -99,6 +99,9 @@ class pre_process:
             + (test["longitude"] - rwanda_center[1]) ** 2
         )
 
+    def process_2020(self):
+        pass
+
     def Fillna(self):
         train = self.train
         test = self.test
@@ -113,9 +116,6 @@ class pre_process:
         numeric_cols = test.columns.drop("ID_LAT_LON_YEAR_WEEK")
         test[numeric_cols] = test[numeric_cols].fillna(test[numeric_cols].mean())
 
-    def porcess_2020(self):
-        pass
-    
     def Standardize(self):
         train = self.train
         test = self.test
