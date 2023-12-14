@@ -1,4 +1,5 @@
 from multiprocessing import process
+from matplotlib import scale
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -17,6 +18,7 @@ from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.model_selection import GridSearchCV
 from xgboost import XGBRegressor
+from sklearn.preprocessing import StandardScaler
 
 
 class model:
@@ -32,18 +34,19 @@ class model:
         return self.ans
 
     def CatBoostRegressor(self):
-        train = self.train
-        test = self.test
+        train = self.train.loc[:, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]]
+        test = self.test.loc[:, ["latitude", "longitude", "year", "week_no", "k_Means"]]
         n_clusters = train["k_Means"].unique()
         cat_params = {
-            "n_estimators": 250,
-            "learning_rate": 0.95,
-            # "learning_rate": 0.09180872710592884,
-            # "depth": 8,
-            # "l2_leaf_reg": 1.0242996861886846,
-            # "subsample": 0.38227256755249117,
-            # "colsample_bylevel": 0.7183481537623551,
-            # "random_state": 42,
+            # "n_estimators": 250,
+            # "learning_rate": 0.95,
+            "n_estimators": 799,
+            "learning_rate": 0.09180872710592884,
+            "depth": 8,
+            "l2_leaf_reg": 1.0242996861886846,
+            "subsample": 0.38227256755249117,
+            "colsample_bylevel": 0.7183481537623551,
+            "random_state": 42,
             "silent": True,
         }
         for i in n_clusters:
@@ -63,8 +66,8 @@ class model:
         self.ans = test.loc[:, ["emission"]]
 
     def RadiusNeighborsRegressor(self):
-        train = self.train.loc[:, ["latitude", "longitude", "week_no", "emission", 'Ozone_solar_azimuth_angle', "dist_rwanda"]]
-        test = self.test.loc[:, ["latitude", "longitude", "week_no", 'Ozone_solar_azimuth_angle', "dist_rwanda"]]
+        train = self.train.loc[:, ["latitude", "longitude", "week_no", "emission"]]
+        test = self.test.loc[:, ["latitude", "longitude", "week_no"]]
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
@@ -92,8 +95,8 @@ class model:
 
     def RandomForestRegressor(self):
         # train = self.train[self.train['year'] != 2020]
-        train = self.train.loc[:, ["latitude", "longitude", "week_no", "emission"]]
-        test = self.test.loc[:, ["latitude", "longitude", "week_no"]]
+        train = self.train.loc[:, ["latitude", "longitude", "year", "week_no", "emission"]]
+        test = self.test.loc[:, ["latitude", "longitude", "year", "week_no"]]
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
@@ -106,8 +109,8 @@ class model:
         self.ans = test.loc[:, ["emission"]]
 
     def AdaBoostRegressor(self):
-        train = self.train.loc[:, ["latitude", "longitude", "week_no", "emission", "k_Means"]]
-        test = self.test.loc[:, ["latitude", "longitude", "week_no", "k_Means"]]
+        train = self.train.loc[:, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]]
+        test = self.test.loc[:, ["latitude", "longitude", "year", "week_no", "k_Means"]]
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
@@ -120,8 +123,8 @@ class model:
         self.ans = test.loc[:, ["emission"]]
 
     def LinearRegression(self):
-        train = self.train.loc[:, ["latitude", "longitude", "week_no", "emission", "k_Means"]]
-        test = self.test.loc[:, ["latitude", "longitude", "week_no", "k_Means"]]
+        train = self.train.loc[:, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]]
+        test = self.test.loc[:, ["latitude", "longitude", "year", "week_no", "k_Means"]]
         clusters = train["k_Means"].unique()
         for i in clusters:
             train_c = train[train["k_Means"] == i]
@@ -140,12 +143,15 @@ class model:
         self.ans = test.loc[:, ["emission"]]
 
     def SupportVectorRegressor(self):
-        train = self.train.loc[:, ["latitude", "longitude", "week_no", "emission"]]
-        test = self.test.loc[:, ["latitude", "longitude", "week_no"]]
+        train = self.train.loc[:, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]]
+        test = self.test.loc[:, ["latitude", "longitude", "year", "week_no", "k_Means"]]
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
+        # scaler = StandardScaler().fit(X)
+        # X = scaler.transform(X)
+        # test_ = scaler.transform(test)
 
-        svr = SVR(max_iter=1000)
+        svr = SVR(max_iter=1000, C=1.0, epsilon=0.1)
         svr.fit(X, y)
         svr_pred = svr.predict(test)
 
@@ -153,8 +159,8 @@ class model:
         self.ans = test.loc[:, ["emission"]]
 
     def DecisionTreeRegressor(self):
-        train = self.train.loc[:, ["latitude", "longitude", "week_no", "emission"]]
-        test = self.test.loc[:, ["latitude", "longitude", "week_no"]]
+        train = self.train.loc[:, ["latitude", "longitude", "year", "week_no", "emission"]]
+        test = self.test.loc[:, ["latitude", "longitude", "year", "week_no"]]
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
@@ -167,8 +173,8 @@ class model:
         self.ans = test.loc[:, ["emission"]]
 
     def XGBoostRegressor(self):
-        train = self.train.loc[:, ["latitude", "longitude", "week_no", "emission", "k_Means"]]
-        test = self.test.loc[:, ["latitude", "longitude", "week_no", "k_Means"]]
+        train = self.train.loc[:, ["latitude", "longitude", "year", "week_no", "emission", "k_Means"]]
+        test = self.test.loc[:, ["latitude", "longitude", "year", "week_no", "k_Means"]]
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 

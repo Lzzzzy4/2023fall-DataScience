@@ -21,6 +21,8 @@ class pre_process:
                 self.Dist_Rwanda()
             elif m == "Fillna":
                 self.Fillna()
+            elif m == "Standardize":
+                self.Standardize()
             elif m == "process_2020":
                 self.process_2020()
             else:
@@ -29,10 +31,8 @@ class pre_process:
         return (self.train, self.test)
 
     def KMeans(self):
-        train = self.train.loc[
-            :, ["latitude", "longitude", "year", "week_no", "emission"]
-        ]
-        test = self.test.loc[:, ["latitude", "longitude", "year", "week_no"]]
+        train = self.train
+        test = self.test
 
         k_model = KMeans(n_clusters=6, n_init=10)
         train_x = train.groupby(by=["latitude", "longitude"], as_index=False)[
@@ -106,9 +106,9 @@ class pre_process:
         train = self.train
         test = self.test
 
-        good_col = 'Ozone_solar_azimuth_angle'
-        train[good_col] = train.groupby(['year'])[good_col].ffill().bfill()
-        test[good_col] = test.groupby(['year'])[good_col].ffill().bfill()
+        good_col = "Ozone_solar_azimuth_angle"
+        train[good_col] = train.groupby(["year"])[good_col].ffill().bfill()
+        test[good_col] = test.groupby(["year"])[good_col].ffill().bfill()
 
         numeric_cols = train.columns.drop("ID_LAT_LON_YEAR_WEEK")
         train[numeric_cols] = train[numeric_cols].fillna(train[numeric_cols].mean())
@@ -118,20 +118,21 @@ class pre_process:
 
     def process_2020_drop(self):
         train = self.train
-        self.train = train[(train.year == 2019) |
-                       (train.year == 2020) & (train.week_no <= 8) |
-                       (train.year == 2021) & (train.week_no > 8)]
-        
+        self.train = train[
+            (train.year == 2019)
+            | (train.year == 2020) & (train.week_no <= 8)
+            | (train.year == 2021) & (train.week_no > 8)
+        ]
+
     def process_2020_fix(self):
         pass
-    
+
     def Standardize(self):
         train = self.train
         test = self.test
         scaler = StandardScaler()
 
-        numeric_cols = train.columns.drop("ID_LAT_LON_YEAR_WEEK")
+        numeric_cols = train.columns.drop(["ID_LAT_LON_YEAR_WEEK", "emission"])
         train[numeric_cols] = scaler.fit_transform(train[numeric_cols])
-
         numeric_cols = test.columns.drop("ID_LAT_LON_YEAR_WEEK")
-        test[numeric_cols] = scaler.fit_transform(test[numeric_cols])
+        test[numeric_cols] = scaler.transform(test[numeric_cols])

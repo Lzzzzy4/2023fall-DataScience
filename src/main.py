@@ -14,7 +14,7 @@ ans = pd.read_csv(data_path + "ans.csv")
 
 methods_pre_process = [
     "Fillna",
-    # "Standardize",
+    "Standardize",
     "KMeans",
     "Rot_15",
     "Rot_30",
@@ -22,14 +22,14 @@ methods_pre_process = [
 ]
 methods_model = [
     "CatBoostRegressor",
-    # "RadiusNeighborsRegressor",
-    # "KNeighborsRegressor",
-    # "RandomForestRegressor",
-    # "AdaBoostRegressor",
-    # "LinearRegression",
-    # "SupportVectorRegressor",
-    # "DecisionTreeRegressor",
-    # "XGBoostRegressor",
+    "RadiusNeighborsRegressor",
+    "KNeighborsRegressor",
+    "RandomForestRegressor",
+    "AdaBoostRegressor",
+    "LinearRegression",
+    "SupportVectorRegressor",
+    "DecisionTreeRegressor",
+    "XGBoostRegressor",
 ]
 methods_judge = ["mean_squared_error"]
 
