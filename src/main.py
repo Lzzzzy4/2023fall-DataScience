@@ -12,7 +12,7 @@ train = pd.read_csv(data_path + "train.csv")
 test = pd.read_csv(data_path + "test.csv")
 ans = pd.read_csv(data_path + "ans.csv")
 
-methods_pre_process = ["KMeans"]
+methods_pre_process = ["Fillna", "Standardize", "KMeans", "Rot_15", "Rot_30", "Dist_Rwanda"]
 methods_model = [
     # "CatBoostRegressor",
     # "RadiusNeighborsRegressor",
@@ -22,7 +22,7 @@ methods_model = [
     "LinearRegression",
     # "SupportVectorRegressor",
     "DecisionTreeRegressor",
-    "XGBoostRegressor",
+    # "XGBoostRegressor",
 ]
 methods_judge = ["mean_squared_error"]
 

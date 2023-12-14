@@ -15,6 +15,7 @@ from sklearn.ensemble import AdaBoostRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.model_selection import GridSearchCV
 from xgboost import XGBRegressor
 
 
@@ -144,7 +145,7 @@ class model:
             X = train_c.drop(columns=["emission", "k_Means"])
             y = train_c["emission"].copy()
 
-            lr = LinearRegression()
+            lr = LinearRegression(n_jobs=-1)
             lr.fit(X, y)
             if 'emission' in test_c.columns:
                 test_c = test_c.drop(columns=['emission'])
@@ -174,11 +175,11 @@ class model:
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
-        dtr = DecisionTreeRegressor()
+        dtr = DecisionTreeRegressor(min_samples_leaf=3, min_samples_split=4)
         dtr.fit(X, y)
         dtr_pred = dtr.predict(test)
 
-        test["emission"] = dtr_pred * 1.1
+        test["emission"] = dtr_pred * 1.072
 
         self.ans = test.loc[:, ["emission"]]
 
