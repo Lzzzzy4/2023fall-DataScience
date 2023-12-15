@@ -274,6 +274,16 @@ Spearman correlation: -0.06904123013729443
 
 \subsubsection{权重量化}
 
+我们在未经处理的数据中直接使用随机森林模型训练，得到的特征权重如下：
+
+\begin{figure}[H]
+      \centering
+      \includegraphics[width=0.9\textwidth]{output11.png}
+      \caption{\label{fig:11}\texttt{特征权重}}
+\end{figure}
+
+可以看出，经纬度的权重较大，周数也是，年份权重虽小但是需要反应新冠趋势，无法舍弃。而其他气象数据的权重和我们先前的预测是相吻合的，与排放量的相关性较小。虽然该权重可能存在一定误差，但是有参考价值，我们后续的工作也将主要围绕时间和空间的特征进行。
+
 \subsection{数据预处理}
 
 \subsubsection{缺失值处理}
