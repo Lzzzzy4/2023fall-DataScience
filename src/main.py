@@ -13,22 +13,22 @@ test = pd.read_csv(data_path + "test.csv")
 ans = pd.read_csv(data_path + "ans.csv")
 
 methods_pre_process = [
-    # "Fillna",
-    # "Standardize",
+    "Fillna",
+    "Standardize",
     "KMeans",
-    # "Rot_15",
-    # "Rot_30",
-    # "Dist_Rwanda",
-    "process_2020_drop",
+    "Rot_15",
+    "Rot_30",
+    "Dist_Rwanda",
+    # "process_2020_drop",
     # "process_2020_fix",
-    "process_2020_addfeatrue",
+    # "process_2020_addfeatrue",
 ]
 methods_model = [
-    "CatBoostRegressor",
+    # "CatBoostRegressor",
     # "RadiusNeighborsRegressor",
     # "KNeighborsRegressor",
     # "RandomForestRegressor",
-    # "AdaBoostRegressor",
+    "AdaBoostRegressor",
     # "LinearRegression",
     # "SupportVectorRegressor",
     # "DecisionTreeRegressor",
