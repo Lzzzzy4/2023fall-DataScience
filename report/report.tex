@@ -128,36 +128,36 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 
 \subsubsection{年份与周数}
 
-首先我们考虑排放量与时间的关系。我们将年份和周数相关联作为日期，作出总排放量关于日期的折线图，得到结果如下（红线划分了2019-2021年的数据）：
+首先我们考虑排放量与时间的关系。我们将年份和周数相关联作为日期，作出总排放量关于日期的折线图，得到结果如下图\ref{fig:2}。（红线划分了2019-2021年的数据）
 
 \begin{figure}[H]
       \centering
       \includegraphics[width=1\textwidth]{output2.png}
-      \caption{date与emission的折线图}
+      \caption{\label{fig:2}排放量关于日期的折线图}
 \end{figure}
 
 可以看出，排放量随时间的变化呈现出一定的周期性，因此我们认为年份和周数对于预测二氧化碳排放量有一定的参考价值。我们将年份和周数作为特征之一加入模型。
 
 但是，值得注意的是，由于新冠病毒的影响，2020年的数据与其他年份的数据有较大的差异，后续需要针对2020年的数据进行特殊处理。
 
-我们将2019与2021年的数据平均后，作图得到排放量关于月份的折线图，结果如下：
+我们将2019与2021年的数据平均后，作图得到排放量关于月份的折线图，结果如图\ref{fig:3}。
 
 \begin{figure}[H]
       \centering
       \includegraphics[width=1\textwidth]{output3.png}
-      \caption{排放量关于月份的折线图}
+      \caption{\label{fig:3}排放量关于月份的折线图}
 \end{figure}
 
 结合两图可以发现，一年内某几个特殊的月份具有较高的排放量，这可能与人类生产活动习惯相关。对于同一个地点，周数（月份）与排放量具有较高的相关性，且关于年份呈现周期变化。这对于数据处理有一定的借鉴意义。
 
 \subsubsection{经纬度}
 
-首先，我们将每个地区的排放量求和，以其排放量为半径，以其经纬度为圆心，按照排放量高低标记颜色从浅至深，作出排放量关于经纬度的分布图，结果如下：
+首先，我们将每个地区的排放量求和，以其排放量为半径，以其经纬度为圆心，按照排放量高低标记颜色从浅至深，作出排放量关于经纬度的分布图，结果如图\ref{fig:9}。
 
 \begin{figure}[H]
       \centering
       \includegraphics[width=1\textwidth]{output9.png}
-      \caption{排放量关于经纬度的分布图}
+      \caption{\label{fig:9}排放量关于经纬度的分布图}
 \end{figure}
 
 和城市聚集类似，几个距离较近的采样点，他们的碳排放量也是相近的，并且不难发现大部分采样点较为密集，这为使用聚类提供了数据支持。在模型中，可以使用距离相近的采样点的数据来相互预测。
@@ -189,12 +189,12 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
       \caption{\label{fig:8}各地点排放量关于周数的折线图}
 \end{figure}
 
-作出各个地点每周碳排放量相比第0周的变化如下：
+作出各个地点每周碳排放量相比第0周的变化如图\ref{fig:6}。
 
 \begin{figure}[H]
       \centering
       \includegraphics[width=1\textwidth]{output6.png}
-      \caption{各地点每周碳排放量相比第0周的折线图}
+      \caption{\label{fig:6}各地点每周碳排放量相比第0周的折线图}
 \end{figure}
 
 可以看出碳排放量有很强的周期性。
@@ -241,7 +241,7 @@ Spearman correlation: -0.06904123013729443
 \begin{figure}[H]
       \centering
       \includegraphics[width=1\textwidth]{output1.png}
-      \caption{\texttt{SulphurDioxide\_SO2\_column\_number\_density} 与 \texttt{emission} 的散点图}
+      \caption{\label{fig:1}\texttt{SulphurDioxide\_SO2\_column\_number\_density} 与 \texttt{emission} 的散点图}
 \end{figure}
 
 可以看出，这两者之间的相关性非常小，因此我们认为\texttt{SO2\_column\_number\_density}数据对于预测二氧化碳排放量的影响可以忽略不计。
@@ -250,7 +250,7 @@ Spearman correlation: -0.06904123013729443
 
 \begin{itemize}
       \item 卢旺达是一个直径200公里的小国，每天都有邻国的空气取代卢旺达的整个大气。即使卢旺达所产生的各种气体之间有一定的相关性，也会被邻国的空气所影响。
-      \item 二氧化碳排放来自不同的部门（地面交通、空中交通、供暖、发电、工厂等），而这些部门并不一定排放与CO2成比例的NO2、CO、SO2等气体。我们认为只在特定区域如工厂，CO2可能会与S02等成正比例关系。
+      \item 二氧化碳排放来自不同的部门（地面交通、空中交通、供暖、发电、工厂等），而这些部门并不一定排放与CO2成比例的NO2、CO、SO2等气体。我们认为只在特定区域如工厂，CO2可能会与SO2等成正比例关系。
 \end{itemize}
 
 因此，我们借用排放量地图进行分析，对排放量最多的地点测量得到的数据进行相关性分析。有理由相信，如果CO2主要来自工厂，会同时产生等比例的大量SO2、CO等气体。以2021年CarbonMonoxide\_CO\_column\_number\_density为例，得到结果如下：
@@ -264,7 +264,7 @@ Spearman correlation: -0.06904123013729443
 \begin{figure}[H]
       \centering
       \includegraphics[width=1\textwidth]{output7.png}
-      \caption{\texttt{CarbonMonoxide\_CO\_column\_number\_density} 与 \texttt{emission} 的散点图}
+      \caption{\label{fig:7}\texttt{CarbonMonoxide\_CO\_column\_number\_density} 与 \texttt{emission} 的散点图}
 \end{figure}
 
 我们无法得出该气体与CO2排放量之间有明显的相关性。类似的，我们对该地点的其他气象数据进行了计算，也未能分析出得到更多有价值的信息。
@@ -288,9 +288,13 @@ Spearman correlation: -0.06904123013729443
 
 \subsubsection{K聚类}
 
-KMeans 是一个常用的聚类算法，它的目标是将数据点分配到 K 个聚类中，使得每个数据点到其所在聚类的质心的距离之和最小。在 Python 的 scikit-learn 库中，可以使用 KMeans 类来使用这个算法。我们选取参数 n\_clusters=6, n\_init=10，对同一个地点的数据取平均后进行聚类。聚类结果如图\ref{fig:0}所示。
+KMeans 是一个常用的聚类算法，它的目标是将数据点分配到 K 个聚类中，使得每个数据点到其所在聚类的质心的距离之和最小。在 Python 的 scikit-learn 库中，可以使用 KMeans 类来使用这个算法。我们选取参数 n\_clusters=6, n\_init=10，对同一个地点的数据取平均后进行聚类。聚类结果如图\ref{fig:10}所示。图中同一种颜色的点位于同一个聚类，但两个黑色点各自为一类。颜色深浅表示类内排放量多少。
 
-TODO
+\begin{figure}[H]
+      \centering
+      \includegraphics[width=1\textwidth]{output10.png}
+      \caption{\label{fig:10}K聚类结果}
+\end{figure}
 
 \subsection{数据预处理}
 
@@ -328,6 +332,8 @@ TODO
 
 \subsubsection{异常值处理}
 2020年的数据受到新冠病毒影响，为异常数据。我们尝试了三种方法，一种为直接舍弃2020年以及2019末和2021初的数据；一种为将2020年的数据按照2019和2021的平均值上调一定幅度；一种为为2020年的数据加入一个特征。
+
+TODO
 
 \subsubsection{数据归一化}
 
@@ -390,15 +396,17 @@ TODO
 
 决策树回归使用决策树模型来进行连续值的预测，而不是像决策树分类那样预测离散的类标签。决策树回归的工作原理与决策树分类类似，都是通过一系列的问题来预测目标变量。但在决策树回归中，每个叶节点都代表一个预测值，这个预测值通常是所有到达该叶节点的数据点的目标变量值的平均值。
 
-可以使用 scikit-learn 库中的 DecisionTreeRegressor 进行决策树回归。选择参数min_samples_leaf=3, min_samples_split=4，选择特征"latitude", "longitude", "year", "week_no", "emission", "k_Means", "rot_30_x"，进行10折验证，最终得到RMSE为9.508541602900749。
+可以使用 scikit-learn 库中的 DecisionTreeRegressor 进行决策树回归。选择参数min\_samples\_leaf=3, min\_samples\_split=4，选择特征"latitude", "longitude", "year", "week\_no", "emission", "k\_Means", "rot\_30\_x"，进行10折验证，最终得到RMSE为9.508541602900749。
 
 \subsubsection{CatBoostRegressor（类别提升）}
+
+TODO
 
 \subsubsection{AdaBoostRegressor（自适应提升）}
 
 自适应提升的工作原理是通过在一系列的弱学习器（例如，深度较浅的决策树）上应用权重，使得后续的模型更加关注在前一轮被错误分类的样本，从而提高整体模型的性能。它的自适应在于：前一个基本分类器被错误分类的样本的权值会增大，而正确分类的样本的权值会减小，并再次用来训练下一个基本分类器。同时，在每一轮迭代中，加入一个新的弱分类器，直到达到某个预定的足够小的错误率或达到预先指定的最大迭代次数才确定最终的强分类器。
 
-选择特征"latitude", "longitude", "year", "week_no", "emission", "rot_30_x", "k_Means"，进行10折验证，最终得到RMSE为49.007571729858626。
+选择特征"latitude", "longitude", "year", "week\_no", "emission", "rot\_30\_x", "k\_Means"，进行10折验证，最终得到RMSE为49.007571729858626。
 
 分析自适应提升的结果较差，原因可能是：
 
@@ -412,19 +420,27 @@ TODO
 
 极端梯度提升是一种优化的分布式梯度提升库，旨在实现高效、灵活和便携。它在许多机器学习竞赛和项目中都表现出色，因为它具有速度快和性能好的特点。
 
+TODO
+
 \subsubsection{RandomForestRegressor（随机森林）}
 
 随机森林通过构建并结合多个决策树来进行预测。随机森林的主要优点是它可以有效地处理大量的输入变量，并且不需要进行特征选择。此外，随机森林还具有很好的鲁棒性，并且可以有效地处理缺失数据和异常值。
 
 我们使用了经纬度、年份、周数作为输入，参数设置min\_samples\_leaf=6，使用随机森林模型进行训练，得到的结果如下：
 
+TODO
+
 \subsubsection{KNeighborsRegressor（K近邻）}
 
 K近邻是一种基于实例的学习或非参数懒惰学习的方法。它的工作原理是，对于一个新的输入实例，算法会在训练数据集中找到与其最近的 K 个实例（即 K 个邻居），然后根据这些邻居的标签来预测新实例的标签。
 
+TODO
+
 \subsubsection{RadiusNeighborsRegressor（半径近邻）}
 
 半径近邻类似于 k-最近邻，但有一个关键的区别：在 k-最近邻算法中，我们选择最近的 k 个点并根据它们的标签来预测新点的标签。然而，在半径近邻中，我们选择在给定半径内的所有点，并根据它们的标签来预测新点的标签。
+
+TODO
 
 \subsection{结果优化}
 
@@ -471,17 +487,25 @@ TODO
 
 最终我们决定使用XXX模型所产生的结果，它与对比答案的RMSE为XXX。
 
+TODO
+
 \section{团队成员分工}
 
 \subsection{吕思翰}
 
+TODO
+
 \subsection{来泽远}
+
+TODO
 
 \subsection{曹宸瑞}
 
 负责缺失值处理、数据归一化、气象数据分析、其他特征分析、交叉验证、模型选择与比较、撰写文档框架。
 
 \section{总结与感悟}
+
+TODO
 
 在本次实验中，我们学习了数据科学的基本流程，包括数据分析、数据预处理、特征工程、模型选择、模型评估等。
 
