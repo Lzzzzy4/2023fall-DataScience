@@ -169,6 +169,7 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
       \item 排放量与季节有很强的依赖性。
       \item 有2个位置的排放量特别大。
       \item 测试集与训练集位置相同。
+      \item 碳排放量有强周期性与聚集效应。
 \end{itemize}
 
 此外，我们考察不同地点碳排放的变化，作出各地点以年为单位的碳排放量变化如图\ref{fig:5}。
@@ -197,11 +198,13 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
       \caption{\label{fig:6}各地点每周碳排放量相比第0周的折线图}
 \end{figure}
 
-可以看出碳排放量有很强的周期性。
-
-建模可以大致从以下方面入手：
-
-TODO
+综合以上信息，可以总结一些预处理和建模的思路。
+\begin{itemize}
+      \item 年份、周数、经纬度都要作为特征加入模型。对于将绝对周数（0-160），我们不将其作为特征加入，原因是年内周数更有效地体现了周期性，而年份体现了新冠病毒影响下的趋势。
+      \item 对于新冠影响，可以考虑修正2020的数据并且对预测值按一定比例提高，可以更有效地还原人类恢复生产的过程。
+      \item 由于强周期性和聚集效应，可以使用聚类的方法，对于同一类的数据，可以使用相似的数据进行预测。
+      \item 由于提供的年份较少以及新冠影响，对于年份的趋势变化的预测较为困难，应该避免过拟合。
+\end{itemize}
 
 \subsubsection{气象数据}
 
@@ -249,21 +252,17 @@ Spearman correlation: -0.06904123013729443
 
 我们无法得出该气体与CO2排放量之间有明显的相关性。类似的，我们对该地点的其他气象数据进行了计算，也未能分析出得到更多有价值的信息。
 
-\subsubsection{到卢旺达中心的距离}
-我们认为CO2排放量与到卢旺达中心的距离有一定的相关性，因此我们计算了每个地点到卢旺达中心的距离，并将其作为特征之一加入模型。
+\subsubsection{权重量化}
 
-\subsubsection{笛卡尔坐标转换}
-我们还发现，在对坐标进行笛卡尔坐标转换后，排放量与坐标的关系较为明显，因此我们将对坐标旋转15°和30°的笛卡尔坐标分别作为特征加入模型。
-
-\subsubsection{K聚类}
-
-KMeans 是一个常用的聚类算法，它的目标是将数据点分配到 K 个聚类中，使得每个数据点到其所在聚类的质心的距离之和最小。在 Python 的 scikit-learn 库中，可以使用 KMeans 类来使用这个算法。我们选取参数 n\_clusters=6, n\_init=10，对同一个地点的数据取平均后进行聚类。聚类结果如图\ref{fig:10}所示。图中同一种颜色的点位于同一个聚类，但两个黑色点各自为一类。颜色深浅表示类内排放量多少。
+我们在未经处理的数据中直接使用随机森林模型训练，得到的特征权重如下：
 
 \begin{figure}[H]
       \centering
-      \includegraphics[width=1\textwidth]{output10.png}
-      \caption{\label{fig:10}K聚类结果}
+      \includegraphics[width=0.9\textwidth]{output11.png}
+      \caption{\label{fig:11}\texttt{特征权重}}
 \end{figure}
+
+可以看出，经纬度的权重较大，周数也是，年份权重虽小但是需要反应新冠趋势，无法舍弃。而其他气象数据的权重和我们先前的预测是相吻合的，与排放量的相关性较小。虽然该权重可能存在一定误差，但是有参考价值，我们后续的工作也将主要围绕时间和空间的特征进行。
 
 \subsection{数据预处理}
 
@@ -307,8 +306,6 @@ KMeans 是一个常用的聚类算法，它的目标是将数据点分配到 K �
 \subsubsection{异常值处理}
 2020年的数据受到新冠病毒影响，为异常数据。我们尝试了三种方法，一种为直接舍弃2020年以及2019末和2021初的数据；一种为将2020年的数据按照2019和2021的平均值上调一定幅度；一种为为2020年的数据加入一个特征。
 
-TODO
-
 \subsubsection{数据归一化}
 
 数据归一化是一种常用的数据预处理技术，用于将数据转换到一个公共的尺度。这种技术在机器学习和数据挖掘中非常常见，因为许多算法（如神经网络）对输入数据的尺度和分布有一定的假设。
@@ -324,6 +321,33 @@ TODO
       train = scaler.transform(train)
       test = scaler.transform(test)
 \end{lstlisting}
+
+\subsubsection{到卢旺达中心的距离}
+我们认为CO2排放量与到卢旺达中心的距离有一定的相关性，因此我们计算了每个地点到卢旺达中心的距离，并将其作为特征之一加入模型。
+
+\subsubsection{笛卡尔坐标转换}
+我们还发现，在对坐标进行笛卡尔坐标转换后，排放量与坐标的关系较为明显，因此我们将对坐标旋转15°和30°的笛卡尔坐标分别作为特征加入模型，具体代码如下：
+
+\begin{lstlisting}[style=Python]
+      train["rot_15_y"] = train["latitude"] * np.cos(np.pi / 12) 
+                        + train["longitude"] * np.sin(np.pi / 12)
+      train["rot_15_x"] = train["longitude"] * np.cos(np.pi / 12) 
+                        + train["latitude"] * np.sin(np.pi / 12)
+      test["rot_15_y"] = test["latitude"] * np.cos(np.pi / 12) 
+                       + test["longitude"] * np.sin(np.pi / 12)
+      test["rot_15_x"] = test["longitude"] * np.cos(np.pi / 12) 
+                       + test["latitude"] * np.sin(np.pi / 12)
+\end{lstlisting}
+
+\subsubsection{K聚类}
+
+KMeans 是一个常用的聚类算法，它的目标是将数据点分配到 K 个聚类中，使得每个数据点到其所在聚类的质心的距离之和最小。在 Python 的 scikit-learn 库中，可以使用 KMeans 类来使用这个算法。我们选取参数 n\_clusters=6, n\_init=10，对同一个地点的数据取平均后进行聚类。聚类结果如图\ref{fig:10}所示。图中同一种颜色的点位于同一个聚类，但两个黑色点各自为一类。颜色深浅表示类内排放量多少。
+
+\begin{figure}[H]
+      \centering
+      \includegraphics[width=1\textwidth]{output10.png}
+      \caption{\label{fig:10}K聚类结果}
+\end{figure}
 
 \subsection{模型选择}
 
@@ -470,15 +494,16 @@ TODO
 
 \subsection{吕思翰}
 
+主要负责，参与了文档撰写和大部分其他工作。
 TODO
 
 \subsection{来泽远}
 
-TODO
+主要负责初版代码与再版框架的编写、关于时间和空间的特征工程、量化分析、异常值处理、K聚类、部分模型编写，参与了文档撰写和大部分其他工作。
 
 \subsection{曹宸瑞}
 
-负责缺失值处理、数据归一化、气象与其他特征分析、交叉验证、模型选择与比较、撰写文档框架。
+主要负责缺失值处理、数据归一化、气象数据与其他特征分析、交叉验证、模型选择与比较、撰写文档框架，参与了文档撰写和大部分其他工作。
 
 \section{总结与感悟}
 
