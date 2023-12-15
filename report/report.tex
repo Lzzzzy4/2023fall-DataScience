@@ -327,9 +327,18 @@ Spearman correlation: -0.06904123013729443
 
 我们认为CO2排放量与距离卢旺达中心的距离有一定的相关性，因此我们计算了每个地点到卢旺达中心的距离，并将其作为特征之一加入模型。
 
-我们还发现，在对坐标进行笛卡尔坐标转换后，排放量与坐标的关系较为明显，因此我们将对坐标旋转15°和30°的笛卡尔坐标分别作为特征加入模型。
+我们还发现，在对坐标进行笛卡尔坐标转换后，排放量与坐标的关系较为明显，因此我们将对坐标旋转15°和30°的笛卡尔坐标分别作为特征加入模型，具体代码如下：
 
-\subsubsection{权重量化}
+\begin{lstlisting}[style=Python]
+      train["rot_15_y"] = train["latitude"] * np.cos(np.pi / 12) 
+                        + train["longitude"] * np.sin(np.pi / 12)
+      train["rot_15_x"] = train["longitude"] * np.cos(np.pi / 12) 
+                        + train["latitude"] * np.sin(np.pi / 12)
+      test["rot_15_y"] = test["latitude"] * np.cos(np.pi / 12) 
+                       + test["longitude"] * np.sin(np.pi / 12)
+      test["rot_15_x"] = test["longitude"] * np.cos(np.pi / 12) 
+                       + test["latitude"] * np.sin(np.pi / 12)
+\end{lstlisting}
 
 \subsection{模型选择}
 
@@ -410,7 +419,15 @@ RMSE（Root Mean Square Error，均方根误差）是一种常用的评估回归
 
 \subsection{预测结果可视化}
 
+我们将2019-2021的训练数据与2021-2022的预测数据按照每日总排放量绘制到同一张图中，进行预测结果可视化，如图所示。
+
+TODO
+
 \subsection{最终得分}
+
+由于kaggle中该比赛从2023年8月1日开始，2023年8月22日结束，在本次工作进行时，kaggle已经关闭了提交通道，因此我们无法得到准确得分。我们将采用与高分答案的对比来评估我们的模型。我们选取的对比答案是来自于kaggle中private数据集排名第三队伍public部分的答案，其private部分得分为9.43672。链接为\href{https://www.kaggle.com/competitions/playground-series-s3e20/discussion/433822}{3rd Place Solution}。
+
+最终我们决定使用XXX模型所产生的结果，它与对比答案的RMSE为XXX。
 
 \section{团队成员分工}
 
