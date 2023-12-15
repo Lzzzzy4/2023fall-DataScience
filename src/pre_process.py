@@ -135,6 +135,7 @@ class pre_process:
 
     def process_2020_addfeatrue(self):
         self.train['is2020'] = (self.train['year'] == 2020)
+        self.test['is2020'] = False
 
     def Standardize(self):
         train = self.train
