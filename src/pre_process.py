@@ -23,8 +23,12 @@ class pre_process:
                 self.Fillna()
             elif m == "Standardize":
                 self.Standardize()
-            elif m == "process_2020":
-                self.process_2020()
+            elif m == "process_2020_drop":
+                self.process_2020_drop()
+            elif m == "process_2020_fix":
+                self.process_2020_fix()
+            elif m == "process_2020_addfeatrue":
+                self.process_2020_addfeatrue()
             else:
                 raise Exception("pre_process: No such method")
 
@@ -99,9 +103,6 @@ class pre_process:
             + (test["longitude"] - rwanda_center[1]) ** 2
         )
 
-    def process_2020(self):
-        pass
-
     def Fillna(self):
         train = self.train
         test = self.test
@@ -120,12 +121,20 @@ class pre_process:
         train = self.train
         self.train = train[
             (train.year == 2019)
-            | (train.year == 2020) & (train.week_no <= 8)
-            | (train.year == 2021) & (train.week_no > 8)
+            | (train.year == 2020) & (train.week_no <= 10)
+            | (train.year == 2021) & (train.week_no > 10)
         ]
 
     def process_2020_fix(self):
-        pass
+        train = self.train
+        avg_emission_non_virus = train[train['year'].isin((2019,2021))].groupby('week_no')['emission'].mean()
+        avg_emission_virus = train[train['year'] == 2020].groupby('week_no')['emission'].mean()
+        ratios_for_weeks = avg_emission_non_virus/avg_emission_virus
+        train.loc[train['year'] == 2020, 'emission'] *= train['week_no'].map(ratios_for_weeks)
+        self.train = train
+
+    def process_2020_addfeatrue(self):
+        self.train['is2020'] = (self.train['year'] == 2020)
 
     def Standardize(self):
         train = self.train
