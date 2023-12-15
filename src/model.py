@@ -22,13 +22,16 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
+from sklearn.preprocessing import MinMaxScaler
 
 
 class model:
     def __init__(self, train, test):
-        use_feature = ["latitude", "longitude", "year", "week_no", "k_Means"]
-        self.train = train.loc[:, use_feature + ["emission"]]
-        self.test = test.loc[:, use_feature]
+        # use_feature = ["latitude", "longitude", "year", "week_no", "k_Means"]
+        # self.train = train.loc[:, use_feature + ["emission"]]
+        # self.test = test.loc[:, use_feature]
+        self.train = train
+        self.test = test
 
     def get_result(self, model):
         assert hasattr(self, model), f"pre_process: No such model {model}"
@@ -138,9 +141,22 @@ class model:
 
     def AdaBoostRegressor(self):
         train = self.train.loc[
-            :, ["latitude", "longitude", "year", "week_no", "emission", "rot_30_x", "k_Means", ]
+            :,
+            [
+                "latitude",
+                "longitude",
+                "year",
+                "week_no",
+                "emission",
+                "rot_30_x",
+                "k_Means",
+            ],
         ]
-        test = self.test.loc[:, ["latitude", "longitude", "year", "week_no", "rot_30_x", "k_Means"]]
+        test = self.test.loc[
+            :, ["latitude", "longitude", "year", "week_no", "rot_30_x", "k_Means"]
+        ]
+        # train = self.train
+        # test = self.test
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
         abr = AdaBoostRegressor()
@@ -195,22 +211,43 @@ class model:
             lr_pred = lr.predict(test_c)
             test.loc[test["k_Means"] == i, "emission"] = lr_pred
 
+        test["emission"] *= 1.06
         self.ans = test.loc[:, ["emission"]]
 
     def SupportVectorRegressor(self):
-        train = self.train
-        test = self.test
-        X = train.drop(columns=["emission"])
-        y = train["emission"].copy()
+        train = self.train.loc[
+            :, ["latitude", "longitude", "week_no", "emission", "k_Means"]
+        ]
+        test = self.test.loc[:, ["latitude", "longitude", "week_no", "k_Means"]]
+
+        n_clusters = train["k_Means"].unique()
+        for i in n_clusters:
+            train_c = train[train["k_Means"] == i]
+            test_c = test[test["k_Means"] == i].drop(columns=["k_Means"])
+            X = train_c.drop(columns=["emission", "k_Means"])
+            y = train_c["emission"].copy()
+            
+            scaler = StandardScaler().fit(X)
+            X = scaler.transform(X)
+            test_c = scaler.transform(test_c)
+
+            svr = SVR(max_iter=1000)
+            svr.fit(X, y)
+            svr_pred = svr.predict(test_c)
+
+            test.loc[test["k_Means"] == i, "emission"] = svr_pred
+
+        # X = train.drop(columns=["emission"])
+        # y = train["emission"].copy()
         # scaler = StandardScaler().fit(X)
         # X = scaler.transform(X)
         # test_ = scaler.transform(test)
 
-        svr = SVR(max_iter=1000, C=1.0, epsilon=0.1)
-        svr.fit(X, y)
-        svr_pred = svr.predict(test)
+        # svr = SVR(kernel='rbf', max_iter=1000)
+        # svr.fit(X, y)
+        # svr_pred = svr.predict(test_)
+        # test["emission"] = svr_pred
 
-        test["emission"] = svr_pred
         self.ans = test.loc[:, ["emission"]]
 
     def DecisionTreeRegressor(self):
@@ -261,14 +298,18 @@ class model:
         self.ans = test.loc[:, ["emission"]]
 
     def XGBoostRegressor(self):
-        train = self.train
-        test = self.test
+        # train = self.train.drop(columns="ID_LAT_LON_YEAR_WEEK")
+        # test = self.test.drop(columns="ID_LAT_LON_YEAR_WEEK")
+        train = self.train.loc[
+            :, ["latitude", "longitude", "week_no", "emission", "k_Means", "year", "rot_30_y", "rot_30_x", "rot_15_y", "rot_15_x"]
+        ]
+        test = self.test.loc[:, ["latitude", "longitude", "week_no", "k_Means", "year", "rot_30_y", "rot_30_x", "rot_15_y", "rot_15_x"]]
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
         xgb = XGBRegressor()
         xgb_cv_scores = list()
-        kf = KFold(n_splits=3, shuffle=True)
+        kf = KFold(n_splits=5, shuffle=True)
         for i, (train_ix, test_ix) in enumerate(kf.split(X)):
             X_train, X_test = X.iloc[train_ix], X.iloc[test_ix]
             Y_train, Y_test = y.iloc[train_ix], y.iloc[test_ix]
@@ -280,7 +321,7 @@ class model:
 
         xgb.fit(X, y)
         xgb_pred = xgb.predict(test)
-        test["emission"] = xgb_pred * 1.1
+        test["emission"] = xgb_pred * 1.06
         self.ans = test.loc[:, ["emission"]]
 
     def FixPrediction(self):
