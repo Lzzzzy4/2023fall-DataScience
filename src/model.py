@@ -154,6 +154,8 @@ class model:
         test["emission"] = rfr_pred * 1.06
         self.ans = test.loc[:, ["emission"]]
 
+        # test.to_csv("result.csv")
+
     def AdaBoostRegressor(self):
         train = self.train.loc[
             :,

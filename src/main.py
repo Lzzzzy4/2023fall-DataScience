@@ -14,14 +14,14 @@ ans = pd.read_csv(data_path + "ans.csv")
 
 methods_pre_process = [
     "Fillna",
-    "Standardize",
+    # "Standardize",
     "KMeans",
     "Rot_15",
     "Rot_30",
     "Dist_Rwanda",
-    "process_2020_drop",
-    "process_2020_fix",
-    "process_2020_addfeatrue",
+    # "process_2020_drop",
+    # "process_2020_fix",
+    # "process_2020_addfeatrue",
 ]
 methods_model = [
     # "CatBoostRegressor",
@@ -43,6 +43,10 @@ def run(methods_pre_process, method_model, method_judge):
 
     m = model(train_csv, test_csv)
     result = m.get_result(method_model)
+
+    test_csv = test.loc[:, ["latitude", "longitude", "week_no", "year"]]
+    test_csv["emission"] = result["emission"]
+    test_csv.to_csv(data_path + "result.csv")
 
     j = judge(result, ans)
     score = j.get_score(method_judge)

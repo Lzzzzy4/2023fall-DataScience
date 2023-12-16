@@ -81,7 +81,7 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 本次比赛的评价指标是均方根误差(RMSE)。RMSE是预测值和实际值之间差异的平方的平均值的平方根。RMSE的值越低，表示模型的预测能力越好。RMSE定义为：
 
 \[
-    RMSE=\sqrt{\frac{1}{N}\sum\limits_{i=1}^{N}(y_i-\hat y_i)^2}.
+      RMSE=\sqrt{\frac{1}{N}\sum\limits_{i=1}^{N}(y_i-\hat y_i)^2}.
 \]
 
 其中 $y_i$ 是真实值，$\hat y_i$ 是预测值，$N$ 是样本数量。
@@ -96,19 +96,19 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
       \centering
       \caption{数据集概览}
       \begin{tabular}{llll}
-          \hline
-          \# & Column & Non-Null Count & Dtype \\ \hline
-          0 & \texttt{ID\_LAT\_LON\_YEAR\_WEEK} & 79023 non-null & \texttt{object} \\
-          1 & \texttt{latitude} & 79023 non-null & \texttt{float64} \\
-          2 & \texttt{longitude} & 79023 non-null & \texttt{float64} \\
-          3 & \texttt{year} & 79023 non-null & \texttt{int64} \\
-          4 & \texttt{week\_no} & 79023 non-null & \texttt{int64} \\
-          5 & \texttt{SulphurDioxide\_SO2\_column\_number\_density} & 64414 non-null & \texttt{float64} \\
-          6 & \texttt{SulphurDioxide\_SO2\_column\_number\_density\_amf} & 64414 non-null & \texttt{float64} \\
-          \ldots{} & & & \\
-          74 & \texttt{Cloud\_solar\_zenith\_angle} & 78539 non-null & \texttt{float64} \\
-          75 & \texttt{emission} & 79023 non-null & \texttt{float64} \\
-          \hline
+            \hline
+            \#       & Column                                                     & Non-Null Count & Dtype            \\ \hline
+            0        & \texttt{ID\_LAT\_LON\_YEAR\_WEEK}                          & 79023 non-null & \texttt{object}  \\
+            1        & \texttt{latitude}                                          & 79023 non-null & \texttt{float64} \\
+            2        & \texttt{longitude}                                         & 79023 non-null & \texttt{float64} \\
+            3        & \texttt{year}                                              & 79023 non-null & \texttt{int64}   \\
+            4        & \texttt{week\_no}                                          & 79023 non-null & \texttt{int64}   \\
+            5        & \texttt{SulphurDioxide\_SO2\_column\_number\_density}      & 64414 non-null & \texttt{float64} \\
+            6        & \texttt{SulphurDioxide\_SO2\_column\_number\_density\_amf} & 64414 non-null & \texttt{float64} \\
+            \ldots{} &                                                            &                &                  \\
+            74       & \texttt{Cloud\_solar\_zenith\_angle}                       & 78539 non-null & \texttt{float64} \\
+            75       & \texttt{emission}                                          & 79023 non-null & \texttt{float64} \\
+            \hline
       \end{tabular}
 \end{table}
 
@@ -216,9 +216,9 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 得到结果如下：
 
 \begin{center}
-Pearson correlation: -0.013960940599134839
+      Pearson correlation: -0.013960940599134839
 
-Spearman correlation: -0.06904123013729443
+      Spearman correlation: -0.06904123013729443
 \end{center}
 
 
@@ -281,21 +281,21 @@ Spearman correlation: -0.06904123013729443
       \caption{缺失值概览}
       \label{tab:1}
       \begin{tabular}{lc}
-      \hline
-      Column & Non-Null Count \\ \hline
-      \texttt{UvAerosolLayerHeight\_aerosol\_height} & 78584 \\
-      \texttt{UvAerosolLayerHeight\_solar\_zenith\_angle} & 78584 \\
-      \texttt{UvAerosolLayerHeight\_solar\_azimuth\_angle} & 78584 \\
-      \ldots{} & \\
-      \texttt{NitrogenDioxide\_tropopause\_pressure} & 18320 \\
-      \texttt{NitrogenDioxide\_stratospheric\_NO2\_column\_number\_density} & 18320 \\
-      \texttt{NitrogenDioxide\_NO2\_slant\_column\_number\_density} & 18320 \\
-      \ldots{} & \\
-      \texttt{SulphurDioxide\_SO2\_column\_number\_density\_15km} & 14609 \\
-      \texttt{SulphurDioxide\_solar\_zenith\_angle} & 14609 \\
-      \texttt{SulphurDioxide\_solar\_azimuth\_angle} & 14609 \\
-      \ldots{} & \\
-      \hline
+            \hline
+            Column                                                                & Non-Null Count \\ \hline
+            \texttt{UvAerosolLayerHeight\_aerosol\_height}                        & 78584          \\
+            \texttt{UvAerosolLayerHeight\_solar\_zenith\_angle}                   & 78584          \\
+            \texttt{UvAerosolLayerHeight\_solar\_azimuth\_angle}                  & 78584          \\
+            \ldots{}                                                              &                \\
+            \texttt{NitrogenDioxide\_tropopause\_pressure}                        & 18320          \\
+            \texttt{NitrogenDioxide\_stratospheric\_NO2\_column\_number\_density} & 18320          \\
+            \texttt{NitrogenDioxide\_NO2\_slant\_column\_number\_density}         & 18320          \\
+            \ldots{}                                                              &                \\
+            \texttt{SulphurDioxide\_SO2\_column\_number\_density\_15km}           & 14609          \\
+            \texttt{SulphurDioxide\_solar\_zenith\_angle}                         & 14609          \\
+            \texttt{SulphurDioxide\_solar\_azimuth\_angle}                        & 14609          \\
+            \ldots{}                                                              &                \\
+            \hline
       \end{tabular}
 \end{table}
 
@@ -451,7 +451,7 @@ CatBoost 是一个由 Yandex 开发的开源机器学习库，主要用于梯度
 
 随机森林通过构建并结合多个决策树来进行预测。随机森林的主要优点是它可以有效地处理大量的输入变量，并且不需要进行特征选择。此外，随机森林还具有很好的鲁棒性，并且可以有效地处理缺失数据和异常值。
 
-我们使用了经纬度、年份、周数作为输入，参数设置 \texttt{min\_samples\_leaf=6}，使用随机森林模型进行3折交叉验证训练，最终结果取乘以1.06，得到结果RMSE=5.358061613113802
+我们使用了经纬度、年份、周数作为输入，参数设置 \texttt{min\_samples\_leaf=6}，使用随机森林模型进行3折交叉验证训练，最终结果取乘以1.06，得到结果RMSE=5.04889854732325。
 
 由于该模型与我们采用的测试集比对结果误差最小，我们在此特别地展示代码如下，其余模型代码不再展示：
 
@@ -519,9 +519,7 @@ $k$-近邻是一种基于实例的学习或非参数懒惰学习的方法。它�
 
 \subsection{RMSE}
 
-% 和前面重复？
-
-RMSE（Root Mean Square Error，均方根误差）是一种常用的评估回归模型性能的指标。它是观测值与真实值偏差的平方和的平均值的平方根。RMSE 的值越小，说明模型的预测性能越好。在 Python 中，可以使用 \texttt{sklearn} 库的 \texttt{mean\_squared\_error} 函数计算 RMSE，代码如下：
+在 Python 中，我们选取 \texttt{sklearn} 库的 \texttt{mean\_squared\_error} 函数计算 RMSE，代码如下：
 
 \begin{lstlisting}[style=Python]
       rmse = mean_squared_error(test["emission"], ans["emission"], squared=False)
@@ -531,15 +529,18 @@ RMSE（Root Mean Square Error，均方根误差）是一种常用的评估回归
 
 由于kaggle中该比赛从2023年8月1日开始，2023年8月22日结束，在本次工作进行时，kaggle已经关闭了提交通道，因此我们无法得到准确得分。我们将采用与高分答案的对比来评估我们的模型。我们选取的对比答案是来自于kaggle中private数据集排名第三队伍public部分的答案，其private部分得分为9.43672。链接为\href{https://www.kaggle.com/competitions/playground-series-s3e20/discussion/433822}{3rd Place Solution}。
 
-最终我们决定使用XXX模型所产生的结果，它与对比答案的RMSE为XXX。
-
-TODO
+最终我们决定使用RandomForestRegressor（随机森林）模型所产生的结果，它与对比答案的RMSE为5.04889854732325。
 
 \subsection{预测结果可视化}
 
-我们将2019-2021的训练数据与2021-2022的预测数据按照每日总排放量绘制到同一张图中，进行预测结果可视化，如图所示。
+我们将2019-2021的训练数据与2021-2022的预测数据按照每日总排放量绘制到同一张图中，进行预测结果可视化，如图\ref{fig:13} 所示。
 
-TODO
+\begin{figure}[H]
+      \centering
+      \includegraphics[width=1\textwidth]{output13.png}
+      \caption{预测结果可视化}
+      \label{fig:13}
+\end{figure}
 
 \section{团队成员分工}
 
@@ -553,7 +554,7 @@ TODO
 
 \subsection{曹宸瑞}
 
-主要负责缺失值处理、数据归一化、气象数据与其他特征分析、交叉验证、模型选择与比较、撰写文档框架，参与了文档撰写和大部分其他工作。
+主要负责方法调研、缺失值处理、数据归一化、气象数据与其他特征分析、交叉验证、大部分模型选择与比较、撰写文档框架，参与了文档撰写和大部分其他工作。
 
 \section{总结与感悟}
 
@@ -563,10 +564,10 @@ TODO
 
 \ctexset{bibname=参考资料}
 \begin{thebibliography}{100}
-\bibitem{ref1}\href{https://www.kaggle.com/code/ambrosm/pss3e20-eda-which-makes-sense}{PSS3E20 EDA which makes sense}
-\bibitem{ref2}\href{https://www.kaggle.com/code/kacperrabczewski/rwanda-co2-step-by-step-guide}{Rwanda CO2: Step by step guide}
-\bibitem{ref3}\href{https://www.kaggle.com/code/yaaangzhou/pg-s3-e20-eda-modeling}{[PG S3 E20] EDA + Modeling}
-\bibitem{ref4}\href{https://www.kaggle.com/code/dmitryuarov/ps3e20-rwanda-emission-advanced-fe-20-88}{PS3E20 | Rwanda emission | Advanced FE | 20.88}
+      \bibitem{ref1}\href{https://www.kaggle.com/code/ambrosm/pss3e20-eda-which-makes-sense}{PSS3E20 EDA which makes sense}
+      \bibitem{ref2}\href{https://www.kaggle.com/code/kacperrabczewski/rwanda-co2-step-by-step-guide}{Rwanda CO2: Step by step guide}
+      \bibitem{ref3}\href{https://www.kaggle.com/code/yaaangzhou/pg-s3-e20-eda-modeling}{[PG S3 E20] EDA + Modeling}
+      \bibitem{ref4}\href{https://www.kaggle.com/code/dmitryuarov/ps3e20-rwanda-emission-advanced-fe-20-88}{PS3E20 | Rwanda emission | Advanced FE | 20.88}
 \end{thebibliography}
 
 \end{document}
