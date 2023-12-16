@@ -151,7 +151,7 @@ class model:
 
         rfr.fit(X, y)
         rfr_pred = rfr.predict(test)
-        test["emission"] = rfr_pred * 1.05
+        test["emission"] = rfr_pred * 1.06
         self.ans = test.loc[:, ["emission"]]
 
     def AdaBoostRegressor(self):
