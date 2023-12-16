@@ -82,7 +82,7 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 本次比赛的评价指标是均方根误差(RMSE)。RMSE是预测值和实际值之间差异的平方的平均值的平方根。RMSE的值越低，表示模型的预测能力越好。RMSE定义为：
 
 \[
-      RMSE=\sqrt{\frac{1}{N}\sum\limits_{i=1}^{N}(y_i-\hat y_i)^2}.
+    \text{RMSE}=\sqrt{\frac{1}{N}\sum\limits_{i=1}^{N}(y_i-\hat y_i)^2}.
 \]
 
 其中 $y_i$ 是真实值，$\hat y_i$ 是预测值，$N$ 是样本数量。
@@ -397,7 +397,7 @@ $K$-Means 是一个常用的聚类算法，它的目标是将数据点分配到 
 
 支持向量回归是支持向量机在回归问题上的应用。它是一种强大的机器学习模型，可以用于解决非线性和高维度的回归问题。SVR 的基本思想是找到一个函数，使得该函数对于训练数据的预测值与真实值之间的误差最小，并且该函数的复杂度也要尽可能小。SVR 使用了一种叫做 $\epsilon$-insensitive loss的损失函数，这种损失函数只考虑预测值与真实值之间的误差大于$\epsilon$的情况，小于$\epsilon$的误差都被忽略。
 
-我们先对整个训练集按照\texttt{latitude}, \texttt{longitude}, \texttt{k\_Means}, \texttt{week\_no}, \texttt{emission}的特征直接进行SVR，迭代次数 1000次，得到的结果为RMSE=196.52008720177972，并且即使在使用了 \texttt{StandardScaler} 或 \texttt{MinMaxScaler} 后，支持向量机均未能收敛，提示\texttt{ConvergenceWarning}。
+我们先对整个训练集按照\texttt{latitude}, \texttt{longitude}, \texttt{k\_Means}, \texttt{week\_no}, \texttt{emission}的特征直接进行SVR，迭代次数 1000次，得到的结果为RMSE = 196.52008720177972，并且即使在使用了 \texttt{StandardScaler} 或 \texttt{MinMaxScaler} 后，支持向量机均未能收敛，提示\texttt{ConvergenceWarning}。
 
 因此，我们采用了对每个聚类分别进行支持向量回归并合并的方法，最终得到RMSE为57.84318401599136，并且仍然提示\texttt{ConvergenceWarning}。
 
@@ -405,7 +405,7 @@ $K$-Means 是一个常用的聚类算法，它的目标是将数据点分配到 
 
 \begin{itemize}
       \item 支持向量回归对于异常值非常敏感。如果训练数据中包含很多异常值，那么支持向量回归可能会过度关注这些异常值，从而影响整体的预测性能。
-      \item 支持向量回归有一些需要调整的参数，如惩罚系数 C 和核函数。如果这些参数没有设置得当，可能会影响支持向量回归的性能。
+      \item 支持向量回归有一些需要调整的参数，如惩罚系数 $C$ 和核函数。如果这些参数没有设置得当，可能会影响支持向量回归的性能。
       \item 因此尝试使用其他的回归模型，如决策树回归或随机森林回归，这些模型可能对异常值更具鲁棒性。
 \end{itemize}
 
@@ -422,11 +422,11 @@ $K$-Means 是一个常用的聚类算法，它的目标是将数据点分配到 
 
 CatBoost 是一个由 Yandex 开发的开源机器学习库，主要用于梯度提升决策树的训练。它可以自动处理分类特征，并防止过拟合。
 
-我们仍然对每个聚类分别采用类别提升。
+我们仍然对每个聚类分别使用 CatBoost 算法预测。
 
-首先我们尝试默认参数下直接进行3折交叉验证，选取特征\texttt{latitude}, \texttt{longitude}, \texttt{year}, \texttt{k\_Means}, \texttt{week\_no}, \texttt{emission}，得到结果为RMSE=12.921159352568171。
+首先我们尝试默认参数下直接进行 3 折交叉验证，选取特征\texttt{latitude}, \texttt{longitude}, \texttt{year}, \texttt{k\_Means}, \texttt{week\_no}, \texttt{emission}，得到结果为RMSE = 12.921159352568171。
 
-我们认为欠拟合。于是更改参数\texttt{learning\_rate=0.1}, \texttt{depth=10}，得到RMSE=11.148340853326738。
+我们认为欠拟合。于是将参数修改为 \texttt{learning\_rate=0.1}, \texttt{depth=10}，得到 RMSE = 11.148340853326738。
 
 \subsubsection{AdaBoostRegressor（自适应提升）}
 
@@ -452,7 +452,7 @@ CatBoost 是一个由 Yandex 开发的开源机器学习库，主要用于梯度
 
 随机森林通过构建并结合多个决策树来进行预测。随机森林的主要优点是它可以有效地处理大量的输入变量，并且不需要进行特征选择。此外，随机森林还具有很好的鲁棒性，并且可以有效地处理缺失数据和异常值。
 
-我们关闭了预处理中的标准化，因为随机森林不需要进行。接着使用经纬度、年份、周数作为输入，参数设置 \texttt{min\_samples\_leaf=6}，使用随机森林模型进行3折交叉验证训练，最终结果取乘以1.06，得到结果RMSE=5.04889854732325。
+我们关闭了预处理中的标准化，因为随机森林不需要进行。接着使用经纬度、年份、周数作为输入，参数设置 \texttt{min\_samples\_leaf=6}，使用随机森林模型进行3折交叉验证训练，最终结果取乘以 1.06，得到结果 RMSE = 5.04889854732325。
 
 由于该模型与我们采用的测试集比对结果误差最小，我们在此特别地展示代码如下，其余模型代码不再展示：
 
@@ -485,15 +485,15 @@ def RandomForestRegressor(self):
 
 $k$-近邻是一种基于实例的学习或非参数懒惰学习的方法。它的工作原理是，对于一个新的输入实例，算法会在训练数据集中找到与其最近的 $k$ 个实例（即 $k$ 个邻居），然后根据这些邻居的标签来预测新实例的标签。
 
-我们调参后选取n\_neighbors=3，并进行3折交叉验证，最终得到RMSE为14.318270658110539。
+我们调参后选取 \texttt{n\_neighbors=3}，并进行3折交叉验证，最终得到RMSE为14.318270658110539。
 
 \subsubsection{RadiusNeighborsRegressor（半径近邻）}
 
 半径近邻类似于 $k$-近邻，但有一个关键的区别：在 $k$-近邻算法中，我们选择最近的 $k$ 个点并根据它们的标签来预测新点的标签。然而，在半径近邻中，我们选择在给定半径内的所有点，并根据它们的标签来预测新点的标签。
 
-我们选取\texttt{latitude}, \texttt{longitude}, \texttt{week\_no}, \texttt{emission}为特征，进行\texttt{radius=0}的半径近邻回归，最后对结果乘以1.07，得到的结果为RMSE=14.318270658110535。
+我们选取\texttt{latitude}, \texttt{longitude}, \texttt{week\_no}, \texttt{emission}为特征，进行 \texttt{radius=0} 的半径近邻回归，最后对结果乘以1.07，得到的结果为RMSE = 14.318270658110535。
 
-需要说明的是，半径近邻无法使用year作为特征，因为year是离散值，而半径近邻只能处理连续值。同时，也无法进行交叉验证，因为半径近邻无法处理离散值。
+需要说明的是，半径近邻无法使用 \texttt{year} 作为特征，因为 \texttt{year} 是离散值，而半径近邻只能处理连续值。同时，也无法进行交叉验证，因为半径近邻无法处理离散值。
 
 可以看出，半径近邻的结果与K近邻最优结果基本一致，因为他们的基本思想是相同的。这两种方法不需要过多调参，但同时也导致了优化空间较小。
 
@@ -518,23 +518,23 @@ $k$-近邻是一种基于实例的学习或非参数懒惰学习的方法。它�
 
 \section{评估}
 
-\subsection{RMSE}
-
-在 Python 中，我们选取 \texttt{sklearn} 库的 \texttt{mean\_squared\_error} 函数计算 RMSE，代码如下：
-
-\begin{lstlisting}[style=Python]
-      rmse = mean_squared_error(test["emission"], ans["emission"], squared=False)
-\end{lstlisting}
+% \subsection{RMSE}
+% 
+% 在 Python 中，我们选取 \texttt{sklearn} 库的 \texttt{mean\_squared\_error} 函数计算 RMSE，代码如下：
+% 
+% \begin{lstlisting}[style=Python]
+%       rmse = mean_squared_error(test["emission"], ans["emission"], squared=False)
+% \end{lstlisting}
 
 \subsection{最终得分}
 
-由于kaggle中该比赛从2023年8月1日开始，2023年8月22日结束，在本次工作进行时，kaggle已经关闭了提交通道，因此我们无法得到准确得分。我们将采用与高分答案的对比来评估我们的模型。我们选取的对比答案是来自于kaggle中private数据集排名第三队伍public部分的答案，其private部分得分为9.43672。链接为\href{https://www.kaggle.com/competitions/playground-series-s3e20/discussion/433822}{3rd Place Solution}。
+由于 Kaggle 中该比赛从2023年8月1日开始，2023年8月22日结束，在本次工作进行时，Kaggle 已经关闭了提交通道，因此我们无法得到准确得分。我们将采用与高分答案的对比来评估我们的模型。我们选取的对比答案是来自于 Kaggle 中 private 数据集排名第三队伍 public 部分的答案，其 private 部分得分为9.43672。链接为 \href{https://www.kaggle.com/competitions/playground-series-s3e20/discussion/433822}{3rd Place Solution}。
 
-最终我们决定使用RandomForestRegressor（随机森林）模型所产生的结果，它与对比答案的RMSE为5.04889854732325。
+最终我们决定使用 RandomForestRegressor（随机森林）模型所产生的结果，它与对比答案的RMSE为5.04889854732325。
 
 \subsection{预测结果可视化}
 
-我们将2019-2021的训练数据与2021-2022的预测数据按照每日总排放量绘制到同一张图中，进行预测结果可视化，如图\ref{fig:13} 所示。
+我们将2019-2021的训练数据与2021-2022的预测数据按照每日总排放量绘制到同一张图中，进行预测结果可视化，如图 \ref{fig:13} 所示。
 
 \begin{figure}[H]
       \centering
@@ -547,7 +547,7 @@ $k$-近邻是一种基于实例的学习或非参数懒惰学习的方法。它�
 
 \subsection{吕思翰}
 
-TODO
+主要参与了部分特征工程方法调研，一些模型的代码编写、调试和分析工作，文档撰写等工作。
 
 \subsection{来泽远}
 
