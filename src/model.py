@@ -1,4 +1,5 @@
 from multiprocessing import process
+from re import S
 from matplotlib import scale
 import numpy as np
 import pandas as pd
@@ -41,34 +42,51 @@ class model:
         return self.ans
 
     def CatBoostRegressor(self):
-        train = self.train
-        test = self.test
+        # train = self.train.drop(columns="ID_LAT_LON_YEAR_WEEK")
+        # test = self.test.drop(columns="ID_LAT_LON_YEAR_WEEK")
+        train = self.train.loc[:, ["latitude", "longitude", "week_no", "emission", "k_Means", "year"]]
+        test = self.test.loc[:, ["latitude", "longitude", "week_no", "k_Means", "year"]]
         n_clusters = train["k_Means"].unique()
         cat_params = {
-            "n_estimators": 250,
-            "learning_rate": 0.95,
-            # "n_estimators": 799,
-            # "learning_rate": 0.09180872710592884,
-            # "depth": 8,
-            # "l2_leaf_reg": 1.0242996861886846,
-            # "subsample": 0.38227256755249117,
-            # "colsample_bylevel": 0.7183481537623551,
-            # "random_state": 42,
+            # "n_estimators": 250,
+            # "learning_rate": 0.95,
+            "n_estimators": 799,
+            "learning_rate": 0.09180872710592884,
+            "depth": 8,
+            "l2_leaf_reg": 1.0242996861886846,
+            "subsample": 0.38227256755249117,
+            "colsample_bylevel": 0.7183481537623551,
             "silent": True,
         }
         for i in n_clusters:
             train_c = train[train["k_Means"] == i]
             test_c = test[test["k_Means"] == i].drop(columns=["k_Means"])
+            if "emission" in test_c.columns:
+                test_c = test_c.drop(columns=["emission"])
             X = train_c.drop(columns=["emission", "k_Means"])
             y = train_c["emission"].copy()
 
-            catboost_reg = CatBoostRegressor(**cat_params)
-            catboost_reg.fit(X, y)
-            # if "emission" in test_c.columns:
-            #     test_c = test_c.drop(columns=["emission"])
-            catboost_pred = catboost_reg.predict(test_c)
+            cbg = CatBoostRegressor(silent=True, learning_rate=0.1, depth=8)
+            cbg_cv_scores = list()
+            kf = KFold(n_splits=3, shuffle=True)
+            for _, (train_ix, test_ix) in enumerate(kf.split(X)):
+                X_train, X_test = X.iloc[train_ix], X.iloc[test_ix]
+                Y_train, Y_test = y.iloc[train_ix], y.iloc[test_ix]
+                cbg_md = cbg.fit(X_train, Y_train)
+                cbg_pred = cbg_md.predict(X_test)
+                cbg_score_fold = mean_squared_error(Y_test, cbg_pred, squared=False)
+                cbg_cv_scores.append(cbg_score_fold)
+            print(
+                "CBG Mean oof RMSE score for cluster",
+                i,
+                " is ==>",
+                np.mean(cbg_cv_scores),
+            )
 
-            test.loc[test["k_Means"] == i, "emission"] = catboost_pred * 1.1
+            cbg.fit(X, y)
+            catboost_pred = cbg.predict(test_c)
+
+            test.loc[test["k_Means"] == i, "emission"] = catboost_pred
 
         self.ans = test.loc[:, ["emission"]]
 
@@ -81,37 +99,37 @@ class model:
         rnr = RadiusNeighborsRegressor(radius=0)
         rnr.fit(X, y)
         rnr_pred = rnr.predict(test)
-        test["emission"] = rnr_pred * 1.1
+        test["emission"] = rnr_pred * 1.07
         self.ans = test.loc[:, ["emission"]]
 
     def KNeighborsRegressor(self):
-        train = self.train
-        test = self.test
+        train = self.train.loc[:, ["latitude", "longitude", "week_no", "emission"]]
+        test = self.test.loc[:, ["latitude", "longitude", "week_no"]]
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
         knr = KNeighborsRegressor(n_neighbors=3)
 
-        knr_cv_scores = list()
-        kf = KFold(n_splits=3, shuffle=True)
-        for i, (train_ix, test_ix) in enumerate(kf.split(X)):
-            X_train, X_test = X.iloc[train_ix], X.iloc[test_ix]
-            Y_train, Y_test = y.iloc[train_ix], y.iloc[test_ix]
-            knr_md = knr.fit(X_train, Y_train)
-            knr_pred = knr_md.predict(X_test)
-            knr_score_fold = mean_squared_error(Y_test, knr_pred, squared=False)
-            knr_cv_scores.append(knr_score_fold)
-        print("KNR Mean oof RMSE score is ==>", np.mean(knr_cv_scores))
+        # knr_cv_scores = list()
+        # kf = KFold(n_splits=3, shuffle=True)
+        # for i, (train_ix, test_ix) in enumerate(kf.split(X)):
+        #     X_train, X_test = X.iloc[train_ix], X.iloc[test_ix]
+        #     Y_train, Y_test = y.iloc[train_ix], y.iloc[test_ix]
+        #     knr_md = knr.fit(X_train, Y_train)
+        #     knr_pred = knr_md.predict(X_test)
+        #     knr_score_fold = mean_squared_error(Y_test, knr_pred, squared=False)
+        #     knr_cv_scores.append(knr_score_fold)
+        # print("KNR Mean oof RMSE score is ==>", np.mean(knr_cv_scores))
 
         knr.fit(X, y)
         knr_pred = knr.predict(test)
-        test["emission"] = knr_pred * 1.1
+        test["emission"] = knr_pred * 1.07
         self.ans = test.loc[:, ["emission"]]
 
     def RandomForestRegressor(self):
         # train = self.train[self.train['year'] != 2020]
-        train = self.train
-        test = self.test
+        train = self.train.loc[:, ["latitude", "longitude", "week_no", "emission", "year"]]
+        test = self.test.loc[:, ["latitude", "longitude", "week_no", "year"]]
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 
@@ -133,11 +151,8 @@ class model:
 
         rfr.fit(X, y)
         rfr_pred = rfr.predict(test)
-        test["emission"] = rfr_pred * 1.1
+        test["emission"] = rfr_pred * 1.06
         self.ans = test.loc[:, ["emission"]]
-
-        # scores = mean_squared_error(y, rfr.predict(X), squared=False)
-        # print("RMSE: %0.2f" % (scores))
 
     def AdaBoostRegressor(self):
         train = self.train.loc[
@@ -219,34 +234,35 @@ class model:
             :, ["latitude", "longitude", "week_no", "emission", "k_Means"]
         ]
         test = self.test.loc[:, ["latitude", "longitude", "week_no", "k_Means"]]
+        # n_clusters = train["k_Means"].unique()
+        # for i in n_clusters:
+        #     train_c = train[train["k_Means"] == i]
+        #     test_c = test[test["k_Means"] == i].drop(columns=["k_Means"])
+        #     if "emission" in test_c.columns:
+        #         test_c = test_c.drop(columns=["emission"])
+        #     X = train_c.drop(columns=["emission", "k_Means"])
+        #     y = train_c["emission"].copy()
 
-        n_clusters = train["k_Means"].unique()
-        for i in n_clusters:
-            train_c = train[train["k_Means"] == i]
-            test_c = test[test["k_Means"] == i].drop(columns=["k_Means"])
-            X = train_c.drop(columns=["emission", "k_Means"])
-            y = train_c["emission"].copy()
-            
-            scaler = StandardScaler().fit(X)
-            X = scaler.transform(X)
-            test_c = scaler.transform(test_c)
+        #     scaler = StandardScaler().fit(X)
+        #     X = scaler.transform(X)
+        #     test_c = scaler.transform(test_c)
 
-            svr = SVR(max_iter=1000)
-            svr.fit(X, y)
-            svr_pred = svr.predict(test_c)
+        #     svr = SVR(max_iter=1000)
+        #     svr.fit(X, y)
+        #     svr_pred = svr.predict(test_c)
 
-            test.loc[test["k_Means"] == i, "emission"] = svr_pred
+        #     test.loc[test["k_Means"] == i, "emission"] = svr_pred
 
-        # X = train.drop(columns=["emission"])
-        # y = train["emission"].copy()
-        # scaler = StandardScaler().fit(X)
-        # X = scaler.transform(X)
-        # test_ = scaler.transform(test)
+        X = train.drop(columns=["emission"])
+        y = train["emission"].copy()
+        scaler = StandardScaler().fit(X)
+        X = scaler.transform(X)
+        test_ = scaler.transform(test)
 
-        # svr = SVR(kernel='rbf', max_iter=1000)
-        # svr.fit(X, y)
-        # svr_pred = svr.predict(test_)
-        # test["emission"] = svr_pred
+        svr = SVR(kernel="rbf", max_iter=1000)
+        svr.fit(X, y)
+        svr_pred = svr.predict(test_)
+        test["emission"] = svr_pred
 
         self.ans = test.loc[:, ["emission"]]
 
@@ -301,9 +317,34 @@ class model:
         # train = self.train.drop(columns="ID_LAT_LON_YEAR_WEEK")
         # test = self.test.drop(columns="ID_LAT_LON_YEAR_WEEK")
         train = self.train.loc[
-            :, ["latitude", "longitude", "week_no", "emission", "k_Means", "year", "rot_30_y", "rot_30_x", "rot_15_y", "rot_15_x"]
+            :,
+            [
+                "latitude",
+                "longitude",
+                "week_no",
+                "emission",
+                "k_Means",
+                "year",
+                "rot_30_y",
+                "rot_30_x",
+                "rot_15_y",
+                "rot_15_x",
+            ],
         ]
-        test = self.test.loc[:, ["latitude", "longitude", "week_no", "k_Means", "year", "rot_30_y", "rot_30_x", "rot_15_y", "rot_15_x"]]
+        test = self.test.loc[
+            :,
+            [
+                "latitude",
+                "longitude",
+                "week_no",
+                "k_Means",
+                "year",
+                "rot_30_y",
+                "rot_30_x",
+                "rot_15_y",
+                "rot_15_x",
+            ],
+        ]
         X = train.drop(columns=["emission"])
         y = train["emission"].copy()
 

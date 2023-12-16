@@ -127,15 +127,23 @@ class pre_process:
 
     def process_2020_fix(self):
         train = self.train
-        avg_emission_non_virus = train[train['year'].isin((2019,2021))].groupby('week_no')['emission'].mean()
-        avg_emission_virus = train[train['year'] == 2020].groupby('week_no')['emission'].mean()
-        ratios_for_weeks = avg_emission_non_virus/avg_emission_virus
-        train.loc[train['year'] == 2020, 'emission'] *= train['week_no'].map(ratios_for_weeks)
+        avg_emission_non_virus = (
+            train[train["year"].isin((2019, 2021))]
+            .groupby("week_no")["emission"]
+            .mean()
+        )
+        avg_emission_virus = (
+            train[train["year"] == 2020].groupby("week_no")["emission"].mean()
+        )
+        ratios_for_weeks = avg_emission_non_virus / avg_emission_virus
+        train.loc[train["year"] == 2020, "emission"] *= train["week_no"].map(
+            ratios_for_weeks
+        )
         self.train = train
 
     def process_2020_addfeatrue(self):
-        self.train['is2020'] = (self.train['year'] == 2020)
-        self.test['is2020'] = False
+        self.train["is2020"] = self.train["year"] == 2020
+        self.test["is2020"] = False
 
     def Standardize(self):
         train = self.train

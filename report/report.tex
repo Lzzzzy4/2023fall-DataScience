@@ -262,7 +262,7 @@ Spearman correlation: -0.06904123013729443
       \caption{\label{fig:11}\texttt{特征权重}}
 \end{figure}
 
-可以看出，经纬度的权重较大，周数也是，年份权重虽小但是需要反应新冠趋势，无法舍弃。而其他气象数据的权重和我们先前的预测是相吻合的，与排放量的相关性较小。虽然该权重可能存在一定误差，但是有参考价值，我们后续的工作也将主要围绕时间和空间的特征进行。
+可以看出，经纬度的权重较大，周数次之，年份权重虽小但是需要反应新冠趋势，无法舍弃。而其他气象数据的权重和我们先前的预测是相吻合的，与排放量的相关性较小。虽然该权重可能存在一定误差，但是有参考价值，我们后续的工作也将主要围绕时间和空间的特征进行。
 
 \subsection{数据预处理}
 
@@ -388,7 +388,19 @@ KMeans 是一个常用的聚类算法，它的目标是将数据点分配到 K �
 
 \subsubsection{SupportVectorRegressor（支持向量回归）}
 
-TODO
+支持向量回归是支持向量机在回归问题上的应用。它是一种强大的机器学习模型，可以用于解决非线性和高维度的回归问题。SVR 的基本思想是找到一个函数，使得该函数对于训练数据的预测值与真实值之间的误差最小，并且该函数的复杂度也要尽可能小。SVR 使用了一种叫做 ε-insensitive loss 的损失函数，这种损失函数只考虑预测值与真实值之间的误差大于 ε 的情况，小于 ε 的误差都被忽略。
+
+我们先对整个训练集按照"latitude", "longitude", "week\_no", "emission", "k\_Means"的特征直接进行SVR，迭代次数 1000次，得到的结果为RMSE=196.52008720177972，并且即使在使用了 StandardScaler 或 MinMaxScaler 后，支持向量机均未能收敛，提示\texttt{ConvergenceWarning}。
+
+因此，我们采用了对每个聚类分别进行支持向量回归并合并的方法，最终得到RMSE为57.84318401599136，并且仍然提示\texttt{ConvergenceWarning}。
+
+支持向量回归的结果较差，原因可能是：
+
+\begin{itemize}
+      \item 支持向量回归对于异常值非常敏感。如果训练数据中包含很多异常值，那么支持向量回归可能会过度关注这些异常值，从而影响整体的预测性能。
+      \item 支持向量回归有一些需要调整的参数，如惩罚系数 C 和核函数。如果这些参数没有设置得当，可能会影响支持向量回归的性能。
+      \item 因此尝试使用其他的回归模型，如决策树回归或随机森林回归，这些模型可能对异常值更具鲁棒性。
+\end{itemize}
 
 \subsubsection{DecisionTreeRegressor（决策树回归）}
 
@@ -398,7 +410,13 @@ TODO
 
 \subsubsection{CatBoostRegressor（类别提升）}
 
-TODO
+CatBoost 是一个由 Yandex 开发的开源机器学习库，主要用于梯度提升决策树的训练。它可以自动处理分类特征，并防止过拟合。
+
+我们仍然对每个聚类分别采用类别提升。
+
+首先我们尝试默认参数下直接进行3折交叉验证，选取特征"latitude", "longitude", "week\_no", "emission", "k\_Means", "year"，得到结果为RMSE=12.921159352568171。
+
+我们认为欠拟合。于是更改参数learning\_rate=0.1, depth=10，得到RMSE=11.148340853326738。
 
 \subsubsection{AdaBoostRegressor（自适应提升）}
 
@@ -418,32 +436,56 @@ TODO
 
 极端梯度提升是一种优化的分布式梯度提升库，旨在实现高效、灵活和便携。它在许多机器学习竞赛和项目中都表现出色，因为它具有速度快和性能好的特点。
 
-"latitude", "longitude", "week_no", "k_Means", "year", "rot_30_y", "rot_30_x", "rot_15_y", "rot_15_x"
-3次交叉验证
-1.07
-10.661617273590501
-
-TODO
+我们选取"latitude", "longitude", "week\_no", "k\_Means", "year", "rot\_30\_y", "rot\_30\_x", "rot\_15\_y", "rot\_15\_x"共9个特征进行极端梯度提升，在3次交叉验证、结果乘以1.07后，RMSE能达到10.661617273590501。
 
 \subsubsection{RandomForestRegressor（随机森林）}
 
 随机森林通过构建并结合多个决策树来进行预测。随机森林的主要优点是它可以有效地处理大量的输入变量，并且不需要进行特征选择。此外，随机森林还具有很好的鲁棒性，并且可以有效地处理缺失数据和异常值。
 
-我们使用了经纬度、年份、周数作为输入，参数设置min\_samples\_leaf=6，使用随机森林模型进行训练，得到的结果如下：
+我们使用了经纬度、年份、周数作为输入，参数设置min\_samples\_leaf=6，使用随机森林模型进行3折交叉验证训练，最终结果取乘以1.06，得到结果RMSE=5.358061613113802
 
-TODO
+由于该模型与我们采用的测试集比对结果误差最小，我们在此特别地展示代码如下，其余模型代码不再展示：
+
+\begin{lstlisting}[style=Python]
+def RandomForestRegressor(self):
+      train = self.train.loc[:, ["latitude", "longitude", "week_no", "emission", "year"]]
+      test = self.test.loc[:, ["latitude", "longitude", "week_no", "year"]]
+      X = train.drop(columns=["emission"])
+      y = train["emission"].copy()
+
+      rfr = RandomForestRegressor()
+      rf_cv_scores = list()
+      kf = KFold(n_splits=3, shuffle=True)
+      for i, (train_ix, test_ix) in enumerate(kf.split(X)):
+      X_train, X_test = X.iloc[train_ix], X.iloc[test_ix]
+      Y_train, Y_test = y.iloc[train_ix], y.iloc[test_ix]
+      rf_md = rfr.fit(X_train, Y_train)
+      rf_pred = rf_md.predict(X_test)
+      rf_score_fold = mean_squared_error(Y_test, rf_pred, squared=False)
+      rf_cv_scores.append(rf_score_fold)
+      print("RF Mean oof RMSE score is ==>", np.mean(rf_cv_scores))
+
+      rfr.fit(X, y)
+      rfr_pred = rfr.predict(test)
+      test["emission"] = rfr_pred * 1.06
+      self.ans = test.loc[:, ["emission"]]
+\end{lstlisting}
 
 \subsubsection{KNeighborsRegressor（K近邻）}
 
 K近邻是一种基于实例的学习或非参数懒惰学习的方法。它的工作原理是，对于一个新的输入实例，算法会在训练数据集中找到与其最近的 K 个实例（即 K 个邻居），然后根据这些邻居的标签来预测新实例的标签。
 
-TODO
+我们调参后选取n\_neighbors=3，并进行3折交叉验证，最终得到RMSE为14.318270658110539。
 
 \subsubsection{RadiusNeighborsRegressor（半径近邻）}
 
 半径近邻类似于 k-最近邻，但有一个关键的区别：在 k-最近邻算法中，我们选择最近的 k 个点并根据它们的标签来预测新点的标签。然而，在半径近邻中，我们选择在给定半径内的所有点，并根据它们的标签来预测新点的标签。
 
-TODO
+我们选取"latitude", "longitude", "week\_no", "emission"为特征，进行radius=0的半径近邻回归，最后对结果乘以1.07，得到的结果为RMSE=14.318270658110535。
+
+需要说明的是，半径近邻无法使用year作为特征，因为year是离散值，而半径近邻只能处理连续值。同时，也无法进行交叉验证，因为半径近邻无法处理离散值。
+
+可以看出，半径近邻的结果与K近邻最优结果基本一致，因为他们的基本思想是相同的。这两种方法不需要过多调参，但同时也导致了优化空间较小。
 
 \subsection{结果优化}
 
@@ -494,7 +536,6 @@ TODO
 
 \subsection{吕思翰}
 
-主要负责，参与了文档撰写和大部分其他工作。
 TODO
 
 \subsection{来泽远}
@@ -506,8 +547,6 @@ TODO
 主要负责缺失值处理、数据归一化、气象数据与其他特征分析、交叉验证、模型选择与比较、撰写文档框架，参与了文档撰写和大部分其他工作。
 
 \section{总结与感悟}
-
-TODO
 
 在本次实验中，我们学习了数据科学的基本流程，包括数据分析、数据预处理、特征工程、模型选择、模型评估等。
 
