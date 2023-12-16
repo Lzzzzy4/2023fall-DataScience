@@ -90,34 +90,32 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 
 \subsection{数据概览与特性}
 
+训练集的基本信息如下。
+
 \begin{table}[h]
       \centering
-      \begin{tabular}{l|l|l|l}
-      \hline
-          \ & Column & Non-Null Count & Dtype \\ \hline
-          0 & \texttt{ID\_LAT\_LON\_YEAR\_WEEK} & 79023 \texttt{non-null} &
-          \texttt{object} \\
-          1 & \texttt{latitude} & 79023 \texttt{non-null} & \texttt{float64} \\
-          2 & \texttt{longitude} & 79023 \texttt{non-null} & \texttt{float64} \\
-          3 & \texttt{year} & 79023 \texttt{non-null} & \texttt{int64} \\
-          4 & \texttt{week\_no} & 79023 \texttt{non-null} & \texttt{int64} \\
-          5 & \texttt{SulphurDioxide\_SO2\_column\_number\_density} & 64414
-          \texttt{non-null} & \texttt{float64} \\
-          6 & \texttt{SulphurDioxide\_SO2\_column\_number\_density\_amf} & 64414
-          \texttt{non-null} & \texttt{float64} \\
+      \caption{数据集概览}
+      \begin{tabular}{llll}
+          \hline
+          \# & Column & Non-Null Count & Dtype \\ \hline
+          0 & \texttt{ID\_LAT\_LON\_YEAR\_WEEK} & 79023 non-null & \texttt{object} \\
+          1 & \texttt{latitude} & 79023 non-null & \texttt{float64} \\
+          2 & \texttt{longitude} & 79023 non-null & \texttt{float64} \\
+          3 & \texttt{year} & 79023 non-null & \texttt{int64} \\
+          4 & \texttt{week\_no} & 79023 non-null & \texttt{int64} \\
+          5 & \texttt{SulphurDioxide\_SO2\_column\_number\_density} & 64414 non-null & \texttt{float64} \\
+          6 & \texttt{SulphurDioxide\_SO2\_column\_number\_density\_amf} & 64414 non-null & \texttt{float64} \\
           \ldots{} & & & \\
-          74 & \texttt{Cloud\_solar\_zenith\_angle} & 78539 \texttt{non-null} &
-          \texttt{float64} \\
-          75 & \texttt{emission} & 79023 \texttt{non-null} & \texttt{float64} \\
+          74 & \texttt{Cloud\_solar\_zenith\_angle} & 78539 non-null & \texttt{float64} \\
+          75 & \texttt{emission} & 79023 non-null & \texttt{float64} \\
           \hline
       \end{tabular}
-      \caption{数据集概览}
 \end{table}
 
 \begin{itemize}
-      \item 数据集共有79023行，76列，其中75列为特征，1列为预测值。
+      \item 数据集共有 79023 行，76 列，其中 75 列为特征，1 列为预测值。
       \item 只有数字特征特征（不包括用于索引的特征）。
-      \item 训练数据在2019-2021年间测量。
+      \item 训练数据在 2019-2021 年间测量。% ?
       \item 除经纬度外其余值均为 \texttt{float64}，不需要做额外数据处理。
       \item 部分测试量包含空值，可以进行缺失值处理。
       \item 可用作索引的值有 \texttt{latitude}，\texttt{longitude}，\texttt{year} \texttt{week\_no}，需预测值为 \texttt{emission}
@@ -140,7 +138,7 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 
 但是，值得注意的是，由于新冠病毒的影响，2020年的数据与其他年份的数据有较大的差异，后续需要针对2020年的数据进行特殊处理。
 
-我们将2019与2021年的数据平均后，作图得到排放量关于月份的折线图，结果如图\ref{fig:3}。
+我们将2019与2021年的数据平均后，作图得到排放量关于月份的折线图，结果如图 \ref{fig:3}。
 
 \begin{figure}[H]
       \centering
@@ -152,7 +150,7 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
 
 \subsubsection{经纬度}
 
-首先，我们将每个地区的排放量求和，以其排放量为半径，以其经纬度为圆心，按照排放量高低标记颜色从浅至深，作出排放量关于经纬度的分布图，结果如图\ref{fig:9}。
+首先，我们将每个地区的排放量求和，以其排放量为半径，以其经纬度为圆心，按照排放量高低标记颜色从浅至深，作出排放量关于经纬度的分布图，结果如图 \ref{fig:9}。
 
 \begin{figure}[H]
       \centering
@@ -172,30 +170,33 @@ Predict CO2 Emissions in Rwanda（预测卢旺达二氧化碳排放量）
       \item 碳排放量有强周期性与聚集效应。
 \end{itemize}
 
-此外，我们考察不同地点碳排放的变化，作出各地点以年为单位的碳排放量变化如图\ref{fig:5}。
+此外，我们考察不同地点碳排放的变化，作出各地点以年为单位的碳排放量变化如图 \ref{fig:5}。
 
 \begin{figure}[H]
       \centering
       \includegraphics[width=1\textwidth]{output5.png}
-      \caption{\label{fig:5}各地点排放量关于年份的折线图}
+      \caption{各地点排放量关于年份的折线图}
+      \label{fig:5}
 \end{figure}
 
 我们将每一年的碳排放除以2019年的碳排放，作为相对值。若排除新冠的影响，对于绝大部分地点，其碳排放是较为稳定的，在某一个基准附近存一定浮动（多为上升）。而对于这个基准值，经纬度是与其强相关的。
 
-作出各个地点以周为单位的碳排放量变化如图\ref{fig:8}。
+作出各个地点以周为单位的碳排放量变化如图 \ref{fig:8}。
 
 \begin{figure}[H]
       \centering
       \includegraphics[width=1\textwidth]{output8.png}
-      \caption{\label{fig:8}各地点排放量关于周数的折线图}
+      \caption{各地点排放量关于周数的折线图}
+      \label{fig:8}
 \end{figure}
 
-作出各个地点每周碳排放量相比第0周的变化如图\ref{fig:6}。
+作出各个地点每周碳排放量相比第0周的变化如图 \ref{fig:6}。
 
 \begin{figure}[H]
       \centering
       \includegraphics[width=1\textwidth]{output6.png}
-      \caption{\label{fig:6}各地点每周碳排放量相比第0周的折线图}
+      \caption{各地点每周碳排放量相比第0周的折线图}
+      \label{fig:6}
 \end{figure}
 
 综合以上信息，可以总结一些预处理和建模的思路。
@@ -224,19 +225,20 @@ Spearman correlation: -0.06904123013729443
 \begin{figure}[H]
       \centering
       \includegraphics[width=1\textwidth]{output1.png}
-      \caption{\label{fig:1}\texttt{SulphurDioxide\_SO2\_column\_number\_density} 与 \texttt{emission} 的散点图}
+      \caption{\texttt{SulphurDioxide\_SO2\_column\_number\_density} 与 \texttt{emission} 的散点图}
+      \label{fig:1}
 \end{figure}
 
-可以看出，这两者之间的相关性非常小，因此我们认为\texttt{SO2\_column\_number\_density}数据对于预测二氧化碳排放量的影响可以忽略不计。
+可以看出，这两者之间的相关性非常小，因此我们认为 \texttt{SO2\_column\_number\_density} 数据对于预测二氧化碳排放量的影响可以忽略不计。
 
-我们还对其他气象数据进行了类似的分析，但并没有出现与CO2有较大相关性的数据。初步分析后，我们认为这些气象数据与CO2排放量之间可能没有明显关系，理由如下：
+我们还对其他气象数据进行了类似的分析，但并没有出现与 CO2 有较大相关性的数据。初步分析后，我们认为这些气象数据与 CO2 排放量之间可能没有明显关系，理由如下：
 
 \begin{itemize}
       \item 卢旺达是一个直径200公里的小国，每天都有邻国的空气取代卢旺达的整个大气。即使卢旺达所产生的各种气体之间有一定的相关性，也会被邻国的空气所影响。
-      \item 二氧化碳排放来自不同的部门（地面交通、空中交通、供暖、发电、工厂等），而这些部门并不一定排放与CO2成比例的NO2、CO、SO2等气体。我们认为只在特定区域如工厂，CO2可能会与SO2等成正比例关系。
+      \item 二氧化碳排放来自不同的部门（地面交通、空中交通、供暖、发电、工厂等），而这些部门并不一定排放与 CO2 成比例的NO2、CO、SO2等气体。我们认为只在特定区域如工厂，CO2可能会与SO2等成正比例关系。
 \end{itemize}
 
-因此，我们借用排放量地图进行分析，对排放量最多的地点测量得到的数据进行相关性分析。有理由相信，如果CO2主要来自工厂，会同时产生等比例的大量SO2、CO等气体。以2021年CarbonMonoxide\_CO\_column\_number\_density为例，得到结果如下：
+因此，我们借用排放量地图进行分析，对排放量最多的地点测量得到的数据进行相关性分析。有理由相信，如果CO2主要来自工厂，会同时产生等比例的大量SO2、CO等气体。以2021年 \texttt{CarbonMonoxide\_CO\_column\_number\_density} 为例，得到结果如下：
 
 \begin{center}
       Pearson correlation: -0.0016211411671317282
@@ -247,7 +249,8 @@ Spearman correlation: -0.06904123013729443
 \begin{figure}[H]
       \centering
       \includegraphics[width=1\textwidth]{output7.png}
-      \caption{\label{fig:7}\texttt{CarbonMonoxide\_CO\_column\_number\_density} 与 \texttt{emission} 的散点图}
+      \caption{\texttt{CarbonMonoxide\_CO\_column\_number\_density} 与 \texttt{emission} 的散点图}
+      \label{fig:7}
 \end{figure}
 
 我们无法得出该气体与CO2排放量之间有明显的相关性。类似的，我们对该地点的其他气象数据进行了计算，也未能分析出得到更多有价值的信息。
@@ -259,7 +262,8 @@ Spearman correlation: -0.06904123013729443
 \begin{figure}[H]
       \centering
       \includegraphics[width=0.9\textwidth]{output11.png}
-      \caption{\label{fig:11}\texttt{特征权重}}
+      \caption{特征权重}
+      \label{fig:11}
 \end{figure}
 
 可以看出，经纬度的权重较大，周数次之，年份权重虽小但是需要反应新冠趋势，无法舍弃。而其他气象数据的权重和我们先前的预测是相吻合的，与排放量的相关性较小。虽然该权重可能存在一定误差，但是有参考价值，我们后续的工作也将主要围绕时间和空间的特征进行。
@@ -270,11 +274,13 @@ Spearman correlation: -0.06904123013729443
 
 在数据预处理阶段，缺失值处理是一个重要的步骤。缺失值可能会导致统计分析的结果出现偏差，或者使得机器学习算法无法正确地工作。
 
-使用\verb|train.isnull().sum()|可以查看训练集每一列的缺失值数量，结果如表\ref{tab:1}所示。
+使用 \verb|train.isnull().sum()| 可以查看训练集每一列的缺失值数量，结果如表 \ref{tab:1} 所示。
 
 \begin{table}[h]
       \centering
-      \begin{tabular}{l|l}
+      \caption{缺失值概览}
+      \label{tab:1}
+      \begin{tabular}{lc}
       \hline
       Column & Non-Null Count \\ \hline
       \texttt{UvAerosolLayerHeight\_aerosol\_height} & 78584 \\
@@ -291,10 +297,9 @@ Spearman correlation: -0.06904123013729443
       \ldots{} & \\
       \hline
       \end{tabular}
-      \caption{\label{tab:1}缺失值概览}
 \end{table}
 
-虽然某些机器学习算法，如决策树和随机森林，可以直接处理缺失值，但由于后续模型还未确定，故还是在此对缺失值进行处理。对于缺失值较多的列，如\texttt{UvAerosolLayerHeight}，缺失率达到99\%，我们可以考虑直接删除。对于缺失值较少的列，我们可以考虑使用均值填充，或分组后使用邻近非缺失值填充，代码如下：
+虽然某些机器学习算法，如决策树和随机森林，可以直接处理缺失值，但由于后续模型还未确定，故还是在此对缺失值进行处理。对于缺失值较多的列，如 \texttt{UvAerosolLayerHeight}，缺失率达到 99\%，我们可以考虑直接删除。对于缺失值较少的列，我们可以考虑使用均值填充，或分组后使用邻近非缺失值填充，代码如下：
 
 \begin{lstlisting}[style=Python]
       numeric_cols = train.columns.drop("ID_LAT_LON_YEAR_WEEK")
@@ -326,7 +331,7 @@ Spearman correlation: -0.06904123013729443
 我们认为CO2排放量与到卢旺达中心的距离有一定的相关性，因此我们计算了每个地点到卢旺达中心的距离，并将其作为特征之一加入模型。
 
 \subsubsection{笛卡尔坐标转换}
-我们还发现，在对坐标进行笛卡尔坐标转换后，排放量与坐标的关系较为明显，因此我们将对坐标旋转15°和30°的笛卡尔坐标分别作为特征加入模型，具体代码如下：
+我们还发现，在对坐标进行笛卡尔坐标转换后，排放量与坐标的关系较为明显，因此我们将对坐标旋转 15° 和 30° 的笛卡尔坐标分别作为特征加入模型，具体代码如下：
 
 \begin{lstlisting}[style=Python]
       train["rot_15_y"] = train["latitude"] * np.cos(np.pi / 12) 
@@ -339,25 +344,26 @@ Spearman correlation: -0.06904123013729443
                        + test["latitude"] * np.sin(np.pi / 12)
 \end{lstlisting}
 
-\subsubsection{K聚类}
+\subsubsection{K 聚类}
 
-KMeans 是一个常用的聚类算法，它的目标是将数据点分配到 K 个聚类中，使得每个数据点到其所在聚类的质心的距离之和最小。在 Python 的 scikit-learn 库中，可以使用 KMeans 类来使用这个算法。我们选取参数 n\_clusters=6, n\_init=10，对同一个地点的数据取平均后进行聚类。聚类结果如图\ref{fig:10}所示。图中同一种颜色的点位于同一个聚类，但两个黑色点各自为一类。颜色深浅表示类内排放量多少。
+$K$-Means 是一个常用的聚类算法，它的目标是将数据点分配到 $K$ 个聚类中，使得每个数据点到其所在聚类的质心的距离之和最小。在 Python 的 \texttt{scikit-learn} 库中，可以使用 \texttt{KMeans} 类来使用这个算法。我们选取参数 \texttt{n\_clusters=6}, 对同一个地点的数据取平均后进行聚类。聚类结果如图 \ref{fig:10} 所示。图中同一种颜色的点位于同一个聚类，但两个黑色点各自为一类。颜色深浅表示类内排放量多少。
 
 \begin{figure}[H]
       \centering
       \includegraphics[width=1\textwidth]{output10.png}
-      \caption{\label{fig:10}K聚类结果}
+      \caption{K聚类结果}
+      \label{fig:10}
 \end{figure}
 
 \subsection{模型选择}
 
-这是一个回归问题，我们尝试了多种回归模型，包括线性回归、支持向量回归、决策树回归、类别提升、自适应提升、极端梯度提升、随机森林、半径近邻、K近邻等。
+这是一个回归问题，我们尝试了多种回归模型，包括线性回归、支持向量回归、决策树回归、类别提升、自适应提升、极端梯度提升、随机森林、半径近邻、$K$ 近邻等。
 
 \subsubsection{交叉验证}
 
 交叉验证是一种评估模型性能的统计学方法。它的基本思想是将原始数据集分成两部分（训练集和验证集），然后在训练集上训练模型，在验证集上验证模型的性能。这个过程重复多次，每次都用不同的训练集和验证集，最后取平均值作为模型的最终性能。交叉验证的主要优点是它可以利用有限的数据获得模型在未知数据上的性能的更准确的估计。
 
-在 Python 中，可以使用 sklearn 库的 KFold 函数进行交叉验证，以RF为例，代码如下：
+在 Python 中，可以使用 \texttt{sklearn} 库的 \texttt{KFold} 函数进行交叉验证，以RF为例，代码如下：
 
 \begin{lstlisting}[style=Python]
       from sklearn.model_selection import KFold
@@ -375,9 +381,9 @@ KMeans 是一个常用的聚类算法，它的目标是将数据点分配到 K �
 
 \subsubsection{LinearRegression（线性回归）}
 
-线性回归是一种预测模型，在这种模型中，我们假设目标变量和输入特征之间存在线性关系。这种关系可以用下面的数学公式表示：\(y = a \cdot x + b\)，其中，\(y\) 是目标变量，\(x\) 是输入特征，\(a\) 和 \(b\) 是模型的参数，它们定义了直线的斜率和截距。
+线性回归是一种预测模型，在这种模型中，我们假设目标变量和输入特征之间存在线性关系。这种关系可以用下面的数学公式表示：$y = a x + b$，其中，$y$ 是目标变量，$x$ 是输入特征，$a$ 和 $b$ 是模型的参数，它们定义了直线的斜率和截距。
 
-在 Python 中，可以使用 `sklearn' 库的 `LinearRegression' 类来创建一个线性回归模型。我们调参比较后，最终选取特征为 `latitude', `longitude', `week\_no', 对每个K聚类的结果分别进行线性回归并进行10折交叉验证，最后对预测结果乘以1.06，最终得到RMSE为44.9418298861089。
+在 Python 中，可以使用 \texttt{sklearn} 库的 \texttt{LinearRegression} 类来创建一个线性回归模型。我们调参比较后，最终选取特征为 \texttt{latitude}, \texttt{longitude}, \texttt{week\_no}, 对每个K聚类的结果分别进行线性回归并进行10折交叉验证，最后对预测结果乘以 1.06，最终得到 RMSE 为 44.9418298861089。
 
 线性回归所产生的结果与其他模型相比较差，原因可能是：
 
@@ -406,7 +412,10 @@ KMeans 是一个常用的聚类算法，它的目标是将数据点分配到 K �
 
 决策树回归使用决策树模型来进行连续值的预测，而不是像决策树分类那样预测离散的类标签。决策树回归的工作原理与决策树分类类似，都是通过一系列的问题来预测目标变量。但在决策树回归中，每个叶节点都代表一个预测值，这个预测值通常是所有到达该叶节点的数据点的目标变量值的平均值。
 
-可以使用 scikit-learn 库中的 DecisionTreeRegressor 进行决策树回归。选择参数min\_samples\_leaf=3, min\_samples\_split=4，选择特征"latitude", "longitude", "year", "week\_no", "emission", "k\_Means", "rot\_30\_x"，进行10折验证，最终得到RMSE为9.508541602900749。
+可以使用 \texttt{sklearn} 库中的 \texttt{DecisionTreeRegressor} 进行决策树回归。选择参数
+\texttt{min\_samples\_leaf=3}, \texttt{min\_samples\_split=4}，
+选择特征 \texttt{latitude}, \texttt{longitude}, \texttt{year}, \texttt{week\_no}, \texttt{emission}, \texttt{k\_Means}, \texttt{rot\_30\_x}，
+进行 10 折验证，最终得到 RMSE 为 9.508541602900749。
 
 \subsubsection{CatBoostRegressor（类别提升）}
 
@@ -422,7 +431,7 @@ CatBoost 是一个由 Yandex 开发的开源机器学习库，主要用于梯度
 
 自适应提升的工作原理是通过在一系列的弱学习器（例如，深度较浅的决策树）上应用权重，使得后续的模型更加关注在前一轮被错误分类的样本，从而提高整体模型的性能。它的自适应在于：前一个基本分类器被错误分类的样本的权值会增大，而正确分类的样本的权值会减小，并再次用来训练下一个基本分类器。同时，在每一轮迭代中，加入一个新的弱分类器，直到达到某个预定的足够小的错误率或达到预先指定的最大迭代次数才确定最终的强分类器。
 
-选择特征"latitude", "longitude", "year", "week\_no", "emission", "rot\_30\_x", "k\_Means"，进行10折验证，最终得到RMSE为49.007571729858626。
+选择特征 \texttt{latitude}, \texttt{longitude}, \texttt{year}, \texttt{week\_no}, \texttt{emission}, \texttt{rot\_30\_x}, \texttt{k\_Means}，进行 10 折验证，最终得到 RMSE 为 49.007571729858626。
 
 分析自适应提升的结果较差，原因可能是：
 
@@ -436,13 +445,13 @@ CatBoost 是一个由 Yandex 开发的开源机器学习库，主要用于梯度
 
 极端梯度提升是一种优化的分布式梯度提升库，旨在实现高效、灵活和便携。它在许多机器学习竞赛和项目中都表现出色，因为它具有速度快和性能好的特点。
 
-我们选取"latitude", "longitude", "week\_no", "k\_Means", "year", "rot\_30\_y", "rot\_30\_x", "rot\_15\_y", "rot\_15\_x"共9个特征进行极端梯度提升，在3次交叉验证、结果乘以1.07后，RMSE能达到10.661617273590501。
+我们选取使用特征 \texttt{latitude}, \texttt{longitude}, \texttt{week\_no}, \texttt{k\_Means}, \texttt{year}, \texttt{rot\_30\_y}, \texttt{rot\_30\_x}, \texttt{rot\_15\_y}, \texttt{rot\_15\_x}，共9个特征进行极端梯度提升，在3次交叉验证、结果乘以1.07后，RMSE能达到10.661617273590501。
 
 \subsubsection{RandomForestRegressor（随机森林）}
 
 随机森林通过构建并结合多个决策树来进行预测。随机森林的主要优点是它可以有效地处理大量的输入变量，并且不需要进行特征选择。此外，随机森林还具有很好的鲁棒性，并且可以有效地处理缺失数据和异常值。
 
-我们使用了经纬度、年份、周数作为输入，参数设置min\_samples\_leaf=6，使用随机森林模型进行3折交叉验证训练，最终结果取乘以1.06，得到结果RMSE=5.358061613113802
+我们使用了经纬度、年份、周数作为输入，参数设置 \texttt{min\_samples\_leaf=6}，使用随机森林模型进行3折交叉验证训练，最终结果取乘以1.06，得到结果RMSE=5.358061613113802
 
 由于该模型与我们采用的测试集比对结果误差最小，我们在此特别地展示代码如下，其余模型代码不再展示：
 
@@ -473,13 +482,13 @@ def RandomForestRegressor(self):
 
 \subsubsection{KNeighborsRegressor（K近邻）}
 
-K近邻是一种基于实例的学习或非参数懒惰学习的方法。它的工作原理是，对于一个新的输入实例，算法会在训练数据集中找到与其最近的 K 个实例（即 K 个邻居），然后根据这些邻居的标签来预测新实例的标签。
+$k$-近邻是一种基于实例的学习或非参数懒惰学习的方法。它的工作原理是，对于一个新的输入实例，算法会在训练数据集中找到与其最近的 $k$ 个实例（即 $k$ 个邻居），然后根据这些邻居的标签来预测新实例的标签。
 
 我们调参后选取n\_neighbors=3，并进行3折交叉验证，最终得到RMSE为14.318270658110539。
 
 \subsubsection{RadiusNeighborsRegressor（半径近邻）}
 
-半径近邻类似于 k-最近邻，但有一个关键的区别：在 k-最近邻算法中，我们选择最近的 k 个点并根据它们的标签来预测新点的标签。然而，在半径近邻中，我们选择在给定半径内的所有点，并根据它们的标签来预测新点的标签。
+半径近邻类似于 $k$-近邻，但有一个关键的区别：在 $k$-近邻算法中，我们选择最近的 $k$ 个点并根据它们的标签来预测新点的标签。然而，在半径近邻中，我们选择在给定半径内的所有点，并根据它们的标签来预测新点的标签。
 
 我们选取"latitude", "longitude", "week\_no", "emission"为特征，进行radius=0的半径近邻回归，最后对结果乘以1.07，得到的结果为RMSE=14.318270658110535。
 
@@ -489,9 +498,9 @@ K近邻是一种基于实例的学习或非参数懒惰学习的方法。它的�
 
 \subsection{结果优化}
 
-显然，预测出的CO2排放量不可能为负数，因此我们将预测出的负数值置为0。
+显然，预测出的CO2排放量不可能为负数，因此我们将预测出的负数值置为 0。
 
-除此之外，我们相信训练集的数据中，如果某个地点在2019-2021年的CO2排放量均为0，那么这个地点在2022年的CO2排放量也应该为0。因此，我们将这些地点的预测值置为0。
+除此之外，我们相信训练集的数据中，如果某个地点在 2019-2021 年的 CO2 排放量均为 0，那么这个地点在2022年的CO2排放量也应该为 0 。因此，我们将这些地点的预测值置为 0。
 
 代码如下：
 
@@ -510,12 +519,12 @@ K近邻是一种基于实例的学习或非参数懒惰学习的方法。它的�
 
 \subsection{RMSE}
 
-RMSE（Root Mean Square Error，均方根误差）是一种常用的评估回归模型性能的指标。它是观测值与真实值偏差的平方和的平均值的平方根。RMSE 的值越小，说明模型的预测性能越好。在 Python 中，可以使用 scikit-learn 库的 `mean\_squared\_error` 函数计算 RMSE，代码如下：
+% 和前面重复？
+
+RMSE（Root Mean Square Error，均方根误差）是一种常用的评估回归模型性能的指标。它是观测值与真实值偏差的平方和的平均值的平方根。RMSE 的值越小，说明模型的预测性能越好。在 Python 中，可以使用 \texttt{sklearn} 库的 \texttt{mean\_squared\_error} 函数计算 RMSE，代码如下：
 
 \begin{lstlisting}[style=Python]
-      rmse = mean_squared_error(
-          self.test["emission"], self.ans["emission"], squared=False
-      )
+      rmse = mean_squared_error(test["emission"], ans["emission"], squared=False)
 \end{lstlisting}
 
 \subsection{最终得分}
@@ -557,7 +566,7 @@ TODO
 \bibitem{ref1}\href{https://www.kaggle.com/code/ambrosm/pss3e20-eda-which-makes-sense}{PSS3E20 EDA which makes sense}
 \bibitem{ref2}\href{https://www.kaggle.com/code/kacperrabczewski/rwanda-co2-step-by-step-guide}{Rwanda CO2: Step by step guide}
 \bibitem{ref3}\href{https://www.kaggle.com/code/yaaangzhou/pg-s3-e20-eda-modeling}{[PG S3 E20] EDA + Modeling}
-\bibitem{ref3}\href{https://www.kaggle.com/code/dmitryuarov/ps3e20-rwanda-emission-advanced-fe-20-88}{PS3E20 | Rwanda emission | Advanced FE | 20.88}
+\bibitem{ref4}\href{https://www.kaggle.com/code/dmitryuarov/ps3e20-rwanda-emission-advanced-fe-20-88}{PS3E20 | Rwanda emission | Advanced FE | 20.88}
 \end{thebibliography}
 
 \end{document}
