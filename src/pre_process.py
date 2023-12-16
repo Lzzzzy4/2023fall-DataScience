@@ -140,6 +140,7 @@ class pre_process:
             ratios_for_weeks
         )
         self.train = train
+        self.Fillna()
 
     def process_2020_addfeatrue(self):
         self.train["is2020"] = self.train["year"] == 2020
