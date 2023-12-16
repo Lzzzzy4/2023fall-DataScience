@@ -139,7 +139,7 @@ class model:
 
         rfr = RandomForestRegressor()
         rf_cv_scores = list()
-        kf = KFold(n_splits=3, shuffle=True)
+        kf = KFold(n_splits=5, shuffle=True)
         for i, (train_ix, test_ix) in enumerate(kf.split(X)):
             X_train, X_test = X.iloc[train_ix], X.iloc[test_ix]
             Y_train, Y_test = y.iloc[train_ix], y.iloc[test_ix]
@@ -151,10 +151,8 @@ class model:
 
         rfr.fit(X, y)
         rfr_pred = rfr.predict(test)
-        test["emission"] = rfr_pred * 1.06
+        test["emission"] = rfr_pred * 1.05
         self.ans = test.loc[:, ["emission"]]
-
-        # test.to_csv("result.csv")
 
     def AdaBoostRegressor(self):
         train = self.train.loc[
